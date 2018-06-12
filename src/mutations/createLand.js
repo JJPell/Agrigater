@@ -5,13 +5,11 @@ export default graphql`
         $name: String!
         $size: Int!
     ) {
-        createLand(input: {
+        createLand(
             name: $name
             size: $size
-        }) {
+        ) {
             id
-            name
-            size
         }
     }
 `;

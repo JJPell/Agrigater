@@ -20,26 +20,26 @@ class App extends Component {
     return (
 
         <Router>
-            <div id="app">
+            <Switch>
                 <Route exact path="/" component={Home} />
-                <Route exact path="/arable"
+                <Route path="/arable"
 
                     render={({ match: { url } }) => (
                         <Switch>
                             
-                            
-                            <Route exact path={`${url}add`} component={ArableForm} />
+                            <Route exact path={`${url}/`} component={Arable} />
+                            <Route path="/arable/add" component={ArableForm} />
                             <Route path={`${url}/:id`} component={ArableDetail} />
-                            <Route component={Arable} />
-                         
+                            
                         </Switch>
                     )}
 
                 />
+                 
 
                 <Route exact path="/signin" component={SignIn} />
                 <Route exact path="/signup" component={SignUp} />
-            </div>
+            </Switch>
         </Router>
 
     );

@@ -24,8 +24,11 @@ class ArableForm extends Component {
 
     addArable(event) {
 
-        console.log(this.state)
-        this.props.onAdd(this.state);
+        console.log(this.state);
+        this.props.onAdd(this.state).then(response => {
+            this.props.history.replace("/arable");
+        });
+
 
     }
 

@@ -8,39 +8,6 @@ const Input = styled.input``;
 
 class SignIn extends Component {
 
-	state = {
-		email: '',
-		password: ''
-	}
-
-	// componentDidMount() {
-	// 	// Add redirect here if already has token.
-	// }
-
-	inputChange = event => {
-		
-		const {name, value} = event.target;
-		
-		this.setState({[name]: value});
-		console.log(this.state);
-	}
-
-	signIn = (event) => {
-
-		this.props.data.refetch({
-			...this.state
-		}).then(response => {
-			const token = response.data.getToken;
-			if(token === "Unauthorised") {
-
-			} else {
-				localStorage.setItem("token", `Bearer ${token}`);
-				this.props.history.replace("/");
-			}
-
-		});
-	}
-
 	render() {
 
 		const Background = styled.div`
