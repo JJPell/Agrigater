@@ -22,21 +22,28 @@ class App extends Component {
         <Router>
             <Switch>
                 <Route exact path="/" component={Home} />
-                <Route path="/arable"
-
+                <Route 
+                    path="/arable"
                     render={({ match: { url } }) => (
                         <Switch>
                             
                             <Route exact path={`${url}/`} component={Arable} />
-                            <Route path="/arable/add" component={ArableForm} />
-                            <Route path={`${url}/:id`} component={ArableDetail} />
+                            <Route path={`${url}/add`} component={ArableForm} />
+                            <Route path={`${url}/addjob`} component={ArableJobForm} />
+                            <Route path={`${url}/:id`} render={({ match: { url } }) => (
+                                <Switch>
+                                    
+                                    <Route path={`${url}/addjob`} component={ArableJobForm} />
+                                    <Route component={ArableDetail} />
+
+                                    
+                                </Switch>
+                            )} />
                             
                         </Switch>
                     )}
 
                 />
-                 
-
                 <Route exact path="/signin" component={SignIn} />
                 <Route exact path="/signup" component={SignUp} />
             </Switch>

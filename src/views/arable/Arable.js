@@ -137,7 +137,6 @@ class Arable extends Component {
 				onRequestClose={this.handleCloseModal}
 				shouldCloseOnOverlayClick={true}
 				style={modalStyles}
-				landName="test"
 				>
 
 					<div className="modal-dialog" role="document">

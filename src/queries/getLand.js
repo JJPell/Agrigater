@@ -11,6 +11,7 @@ export default graphql`
             name
             size
             jobs {
+                id
                 date
                 type {
                     name

@@ -8,33 +8,71 @@ import { compose, graphql } from "react-apollo";
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
-const sidebarLinks = [{
-    name: "Add Area Job",
-    icon: "add",
-    href: "./addjob"
-}];
+import createJob from "../../mutations/createJob";
+import listJobTypes from "../../queries/listJobTypes";
 
+import { sidebarLinks } from "./sidebar";
 
 
 class ArableJobForm extends Component {
 
-    state = {
+    constructor(props) {
+        super(props);
+        // bind once here, better than multiple times in render
+        this.handleChange = this.handleChange.bind(this);
 
-        selectedOption: '',
+        this.setSelectLand = false;
+        
+    }
+
+    state = { 
+        selectLand: "",
+        selectJobType: "",
+        date: "",
+    };
+
+    getIdFromUrl() {
+        let url = this.props.location.pathname;
+        url = url.replace("/arable/", "");
+        url = url.replace("addjob", "");
+        url = url.replace("/", "");
+        return url;
+    }
+
+    handleChange(event) {
+        this.setState({ [event.target.name]: event.target.value });
+    }
+
+    createJob() {
+
+        const {selectLand, selectJobType, date} = this.state;
+
+        this.props.addJob({land: selectLand, jobType: selectJobType, date}).then(response => {
+            this.props.history.replace("/arable/"+this.state.selectLand);
+        });
 
     }
 
-    landOnChange(selectedOption) {
-
-        this.setState({ selectedOption });
-        console.log(`Selected: ${selectedOption.label}`);
-
+    componentWillReceiveProps(newProps){
+        // Set Initial Values
+        if(!newProps.listLands.loading){
+            this.setState({
+                selectLand: this.getIdFromUrl() || newProps.listLands.listLands[0].id
+            });
+        }
+        if(!newProps.listJobTypes.loading){
+            this.setState({
+                selectJobType: newProps.listJobTypes.listJobTypes[0].id
+            });
+        }
     }
 
     render() {
+        const { selectLand, selectJobType, date } = this.state;
+        const listLands = this.props.listLands.listLands || [];
+        const listJobTypes = this.props.listJobTypes.listJobTypes || [];
 
-        const { selectedOption } = this.state;
-
+        //console.log(listLands)
         return (
             <Dashboard sidebar={sidebarLinks}>
                 <div className="card">
@@ -45,22 +83,26 @@ class ArableJobForm extends Component {
                     <div className="card-body">
                         <form>
                             <div className="form-group">
-                                <label>Example select</label>
-                                <select className="form-control" >
-                                    {this.props.landOptions.map(function(land) {
-                                        return <option value={land.id}>{land.name}</option>;
+                                <label>Arable Area</label>
+                                <select key={this.props.listLands.loading ? 'notLoadedYet' : 'loaded'} name="selectLand" className="form-control" value={selectLand} onChange={this.handleChange}>
+                                    {listLands.map(function(land) {
+                                        return <option key={land.id} value={land.id}>{land.name}</option>;
                                     })}
                                 </select>
                             </div>
                             <div className="form-group">
                                 <label>Job Type</label>
-                                <input type="text" className="form-control" placeholder="name e.g. rectory farm" />
+                                <select name="selectJobType" className="form-control" value={selectJobType} onChange={this.handleChange}>
+                                    {listJobTypes.map(function(jobType) {
+                                        return <option key={jobType.id} value={jobType.id}>{jobType.name}</option>;
+                                    })}
+                                </select>
                             </div>
                             <div className="form-group">
                                 <label>Date of Job</label>
-                                <input type="text" className="form-control" placeholder="size in acres" />
+                                <input type="date" name="date" className="form-control" value={date} onChange={this.handleChange} />
                             </div>
-                            <button className="btn btn-primary" type="button" >Submit</button>
+                            <button className="btn btn-primary" type="button" onClick={this.createJob.bind(this)} >Submit</button>
                         </form>
                     </div>
                 </div>
@@ -69,26 +111,37 @@ class ArableJobForm extends Component {
     }
 }
 
-export default graphql(gql`
+export default compose(
 
-    query listLands {
-  
-        listLands{
-            items {
+    graphql(gql`
+
+        query listLands {
+    
+            listLands{
                 id
                 name
             }
+
         }
 
-    }
-
-`, {
-	options: {
-		fetchPolicy: "cache-and-network"
-	},
-	props: props => ({
-		landOptions: props.data.listLands ? props.data.listLands.items : []
-	})
-}
+    `, {
+        name: "listLands",
+        options: {
+            fetchPolicy: "cache-and-network"
+        }
+    }),
+    graphql(listJobTypes, {
+        name: "listJobTypes",
+        options: {
+            fetchPolicy: "cache-and-network"
+        }
+    }),
+    graphql(createJob, {
+        props: props => ({
+            addJob: args => props.mutate({
+                variables: args
+            })
+        })
+    })
 
 )(ArableJobForm);

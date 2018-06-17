@@ -18,13 +18,9 @@ class Sidebar extends Component {
 
 			{links.map((link, i) => {
 				return 	<li className="nav-item" key={i}>
-							<span className="nav-link btn btn-primary btn-outline-primary" >
-								<FontAwesome name={link.icon} />
-								&nbsp;
-								<Link to={link.href}>
-									{link.name}
-								</Link>
-							</span>
+							<Link className="nav-link btn btn-primary btn-outline-primary" to={link.href}>
+								{link.name}
+							</Link>
 						</li>
 				}
 			)}
