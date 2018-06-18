@@ -8,6 +8,8 @@ import ArableForm from "./views/arable/ArableForm";
 import ArableDetail from "./views/arable/ArableDetail";
 import ArableJobForm from "./views/arable/ArableJobForm";
 
+import Livestock from "./views/livestock/Livestock";
+
 import SignIn from "./views/signIn/SignIn";
 import SignUp from "./views/SignUp";
 
@@ -42,7 +44,17 @@ class App extends Component {
                             
                         </Switch>
                     )}
-
+                />
+                <Route 
+                    path="/livestock"
+                    render={({ match: { url } }) => (
+                        <Switch>
+                            
+                            <Route exact path={`${url}/`} component={Livestock} />
+                            <Route path={`${url}/add`} component={Livestock} />
+                            
+                        </Switch>
+                    )}
                 />
                 <Route exact path="/signin" component={SignIn} />
                 <Route exact path="/signup" component={SignUp} />
