@@ -5,9 +5,6 @@ import Dashboard from "../layout/Dashboard";
 
 import { compose, graphql } from "react-apollo";
 
-import Select from 'react-select';
-import 'react-select/dist/react-select.css';
-
 import createJob from "../../mutations/createJob";
 import listJobTypes from "../../queries/listJobTypes";
 

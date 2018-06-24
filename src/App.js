@@ -9,6 +9,7 @@ import ArableDetail from "./views/arable/ArableDetail";
 import ArableJobForm from "./views/arable/ArableJobForm";
 
 import Livestock from "./views/livestock/Livestock";
+import LivestockForm from "./views/livestock/LivestockForm";
 
 import SignIn from "./views/signIn/SignIn";
 import SignUp from "./views/SignUp";
@@ -51,7 +52,7 @@ class App extends Component {
                         <Switch>
                             
                             <Route exact path={`${url}/`} component={Livestock} />
-                            <Route path={`${url}/add`} component={Livestock} />
+                            <Route path={`${url}/add`} component={LivestockForm} />
                             
                         </Switch>
                     )}

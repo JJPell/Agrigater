@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Auth } from 'aws-amplify';
 import styled from 'styled-components';
 
 import loginImg from '../img/login-screen.jpg';
@@ -21,34 +20,7 @@ class SignUp extends Component {
     user: {},
     authCode: ''
   }
-  componentDidMount() {
-    Auth.currentAuthenticatedUser()
-      .then(user => {
-        //this.props.navigation.navigate('AppNav')
-        console.log("currentAuthenticatedUser")
-      })
-      .catch(err => console.log('err: ', err))
-  }
-  onUsernameChange(event) {
-    this.setState({ "username": event.target.value })
-  }
-  onPasswordChange(event) {
-    this.setState({ "password": event.target.value })
-  }
-  signIn = () => {
-
-//    console.log("test");
-    const { username, password } = this.state
-    Auth.signIn(username, password)
-      .then(user => {
-        console.log('successful sign in!');
-        console.log(user);
-        this.setState({ user });
-      })
-      .catch(err => {
-        console.log('error signin in!: ', err)
-      })
-  }
+  
   render() {
 
 	const Background = styled.div`

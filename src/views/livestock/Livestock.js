@@ -13,7 +13,7 @@ import "react-table/react-table.css";
 import { compose, graphql } from "react-apollo";
 
 import listAnimals from "../../queries/listAnimals";
-import deleteLand from "../../mutations/deleteLand";
+import deleteAnimal from "../../mutations/deleteAnimal";
 
 import { sidebarLinks } from "./sidebar";
 
@@ -38,7 +38,7 @@ class Livestock extends Component {
 		super();
 		this.state = {
 			showModal: false,
-			selectedLand: null
+			selectedAnimal: null
 		};
 		
 		this.handleOpenModal = this.handleOpenModal.bind(this);
@@ -48,18 +48,18 @@ class Livestock extends Component {
 	handleOpenModal (land) {
 		this.setState({ 
 			showModal: true, 
-			selectedLand: land
+			selectedAnimal: land
 		});
 	}
 	
 	handleCloseModal () {
 		this.setState({ 
 			showModal: false,
-			selectedLand: null
+			selectedAnimal: null
 		});
 	}
 
-	deleteLand = ({id}) => {
+	deleteAnimal = ({id}) => {
 
 		this.props.mutate({
 			variables: { id }
@@ -159,10 +159,10 @@ class Livestock extends Component {
 								</button>
 							</div>
 							<div className="modal-body">
-								<p>Are you sure you want to delete this arable area { this.state.selectedLand ? `"${this.state.selectedLand.name}"` : ""}?</p>
+								<p>Are you sure you want to delete { this.state.selectedAnimal ? this.state.selectedAnimal.quantity : "this" } { this.state.selectedAnimal ? this.state.selectedAnimal.breed.name : "" } { this.state.selectedAnimal ? this.state.selectedAnimal.type.name : "" }?</p>
 							</div>
 							<div className="modal-footer">
-								<button type="button" className="btn btn-danger" onClick={() => this.deleteLand(this.state.selectedLand)}>Yes</button>
+								<button type="button" className="btn btn-danger" onClick={() => this.deleteAnimal(this.state.selectedAnimal)}>Yes</button>
 								<button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.handleCloseModal}>No</button>
 							</div>
 						</div>
@@ -183,7 +183,7 @@ export default compose(
 			fetchPolicy: "cache-and-network"
 		}
 	}),
-	graphql(deleteLand, {
+	graphql(deleteAnimal, {
 		options: {
 			fetchPolicy: "cache-and-network"
 		}
