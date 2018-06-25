@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import Dashboard from "../layout/Dashboard";
 import FontAwesome from 'react-fontawesome';
-import { Link } from "react-router-dom";
 
 import ReactTable from "react-table";
 import Modal from 'react-modal';

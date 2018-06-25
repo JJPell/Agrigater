@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import Dashboard from "../layout/Dashboard";
 
-import { compose, graphql } from "react-apollo";
+import { graphql } from "react-apollo";
 import createLand from "../../mutations/createLand";
 
 import { sidebarLinks } from "./sidebar";

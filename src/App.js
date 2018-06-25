@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import Home from "./views/Home";
@@ -10,6 +10,9 @@ import ArableJobForm from "./views/arable/ArableJobForm";
 
 import Livestock from "./views/livestock/Livestock";
 import LivestockForm from "./views/livestock/LivestockForm";
+
+import Stock from "./views/stock/Stock";
+import StockForm from "./views/stock/StockForm";
 
 import SignIn from "./views/signIn/SignIn";
 import SignUp from "./views/SignUp";
@@ -53,6 +56,17 @@ class App extends Component {
                             
                             <Route exact path={`${url}/`} component={Livestock} />
                             <Route path={`${url}/add`} component={LivestockForm} />
+                            
+                        </Switch>
+                    )}
+                />
+                <Route 
+                    path="/stock"
+                    render={({ match: { url } }) => (
+                        <Switch>
+                            
+                            <Route exact path={`${url}/`} component={Stock} />
+                            <Route path={`${url}/add`} component={StockForm} />
                             
                         </Switch>
                     )}

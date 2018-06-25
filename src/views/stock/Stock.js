@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import FontAwesome from 'react-fontawesome';
+import _ from "lodash";
 
 import Dashboard from "../layout/Dashboard";
 
@@ -10,8 +11,8 @@ import "react-table/react-table.css";
 
 import { compose, graphql } from "react-apollo";
 
-import listLands from "../../queries/listLands";
-import deleteLand from "../../mutations/deleteLand";
+import listStock from "../../queries/listStock";
+import deleteStock from "../../mutations/deleteStock";
 
 import { sidebarLinks } from "./sidebar";
 
@@ -30,34 +31,34 @@ const modalStyles = {
 	}
 };
 
-class Arable extends Component {
+class Stock extends Component {
 
 	constructor () {
 		super();
 		this.state = {
 			showModal: false,
-			selectedLand: null
+			selectedStock: null
 		};
 		
 		this.handleOpenModal = this.handleOpenModal.bind(this);
 		this.handleCloseModal = this.handleCloseModal.bind(this);
 	}
 	
-	handleOpenModal (land) {
+	handleOpenModal (stock) {
 		this.setState({ 
 			showModal: true, 
-			selectedLand: land
+			selectedStock: stock
 		});
 	}
 	
 	handleCloseModal () {
 		this.setState({ 
 			showModal: false,
-			selectedLand: null
+			selectedStock: null
 		});
 	}
 
-	deleteLand = ({id}) => {
+	deleteStock = ({id}) => {
 
 		this.props.mutate({
 			variables: { id }
@@ -71,14 +72,14 @@ class Arable extends Component {
 	}
 
 	render() {
-		let tableData = this.props.data.listLands || [];
+		let tableData = this.props.data.listStock || [];
 		return (
 			<Dashboard sidebar={sidebarLinks}>
 			
 				<div className="card">
 
 					<div className="card-body">
-						<h3 className="card-title">Arable</h3>
+						<h3 className="card-title">Stock</h3>
 						<hr />
 					</div>
 
@@ -87,19 +88,22 @@ class Arable extends Component {
 						<ReactTable
 							columns={[
 								{
-								Header: "Arable",
+								Header: "Stock Table",
 								columns: [
 									{
 										Header: "ID",
 										accessor: "id"
 									},
 									{
-									Header: "Name",
-									accessor: "name"
+										Header: "Name",
+										accessor: "name",
+										Cell: row => {
+											return _.startCase(row.value);
+										}
 									},
 									{
-									Header: "Size",
-									accessor: "size"
+										Header: "Quantity",
+										accessor: "quantity"
 									},
 									{
 										Header: "Actions",
@@ -119,9 +123,7 @@ class Arable extends Component {
 									actions: (
 										<div className="btn-group w-100 m-0" role="group">
 										
-										<Link to={"arable/"+prop["id"]} className="btn btn-primary btn-outline-primary w-50 m-0"><FontAwesome name={"info-circle"} /> Detail</Link>
-										
-										<a href="#" onClick={() => this.handleOpenModal(prop)} className="btn btn-danger btn-outline-danger w-50 m-0"><FontAwesome name={"trash"} /> Delete</a>
+										<a href="#" onClick={() => this.handleOpenModal(prop)} className="btn btn-danger btn-outline-danger w-50 ml-auto"><FontAwesome name={"trash"} /> Delete</a>
 										
 										</div>
 									) 
@@ -147,10 +149,10 @@ class Arable extends Component {
 								</button>
 							</div>
 							<div className="modal-body">
-								<p>Are you sure you want to delete this arable area { this.state.selectedLand ? `"${this.state.selectedLand.name}"` : ""}?</p>
+								<p>Are you sure you want to delete { this.state.selectedStock ? this.state.selectedStock.quantity : "this" } { this.state.selectedStock ? this.state.selectedStock.name : "" } { this.state.selectedStock ? this.state.selectedStock.name : "" }?</p>
 							</div>
 							<div className="modal-footer">
-								<button type="button" className="btn btn-danger" onClick={() => this.deleteLand(this.state.selectedLand)}>Yes</button>
+								<button type="button" className="btn btn-danger" onClick={() => this.deleteStock(this.state.selectedStock)}>Yes</button>
 								<button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.handleCloseModal}>No</button>
 							</div>
 						</div>
@@ -166,14 +168,14 @@ class Arable extends Component {
 
 
 export default compose(
-	graphql(listLands, {
+	graphql(listStock, {
 		options: {
 			fetchPolicy: "cache-and-network"
 		}
 	}),
-	graphql(deleteLand, {
+	graphql(deleteStock, {
 		options: {
 			fetchPolicy: "cache-and-network"
 		}
 	})
-)(Arable);
+)(Stock);
