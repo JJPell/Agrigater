@@ -5,6 +5,8 @@ import Dashboard from "../layout/Dashboard";
 import { graphql } from "react-apollo";
 import createLand from "../../mutations/createLand";
 
+import Button from '@material-ui/core/Button';
+
 import { sidebarLinks } from "./sidebar";
 
 class ArableForm extends Component {
@@ -38,28 +40,37 @@ class ArableForm extends Component {
             <Dashboard sidebar={sidebarLinks}>
             <div className="card">
                 <div className="card-body">
-                    <h3 className="card-title">Add New Arable</h3>
+                    <h3 className="card-title">Create a New Arable Area</h3>
                     <hr />
                 </div>
                 <div className="card-body">
                     <form>
-                        <div className="form-group">
-                            <label>Name of Area</label>
-                            <input type="text" className="form-control" placeholder="name e.g. rectory farm" onChange={this.updateName.bind(this)}/>
+                        <div className="col-sm-12 col-md-6">
+                            <div className="form-group">
+                                <label>Name of Area</label>
+                                <input type="text" className="form-control" placeholder="name e.g. rectory farm" onChange={this.updateName.bind(this)}/>
+                            </div>
+                            <div className="form-group">
+                                <label>Type of arable area</label>
+                                <select className="form-control">
+                                    <option>Farm</option>
+                                    <option>Field</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label>Size of Area</label>
+                                <input type="text" className="form-control" placeholder="size in acres" onChange={this.updateSize.bind(this)}/>
+                            </div>
+                            <div className="form-group">
+                                <label className="bmd-label-floating">Size of Area</label>
+                                <input type="number" className="form-control" />
+                                <span className="bmd-help">This is in Hectares or Acres.</span>
+                            </div>
                         </div>
-                        <div className="form-group">
-                            <label>Size of Area</label>
-                            <input type="text" className="form-control" placeholder="size in acres" onChange={this.updateSize.bind(this)}/>
+                        <div className="col-sm-12 col-md-6">
                         </div>
-                        <div className="form-group">
-                            <label>Type of arable area</label>
-                            <select className="form-control">
-                                <option>Farm</option>
-                                <option>Field</option>
-                                <option>Other</option>
-                            </select>
-                        </div>
-                        <button className="btn btn-primary" type="button" onClick={this.addArable.bind(this)}>Submit</button>
+                        <Button type="button" variant="contained" color="primary" onClick={this.addArable.bind(this)}>Submit</Button>
                     </form>
                 </div>
             </div>

@@ -4,7 +4,6 @@ import FontAwesome from 'react-fontawesome';
 import _ from "lodash";
 
 import Dashboard from "../layout/Dashboard";
-import BootstrapTable from 'react-bootstrap-table-next';
 
 import Modal from 'react-modal';
 import ReactTable from "react-table";

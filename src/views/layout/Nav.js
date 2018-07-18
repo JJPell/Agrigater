@@ -16,7 +16,7 @@ class Nav extends Component {
         return (
 
             <nav className="navbar navbar-expand-md navbar-dark bg-primary">
-                <a className="navbar-brand" href="/">Farm Valuation</a>
+                <a className="navbar-brand" href="/">Agrigater</a>
                 <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon" />
                 </button>

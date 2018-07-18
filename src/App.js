@@ -1,7 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import Home from "./views/Home";
+
+import Report from "./views/report/Report";
 
 import Arable from "./views/arable/Arable";
 import ArableForm from "./views/arable/ArableForm";
@@ -21,13 +23,18 @@ import "bootstrap-material-design/dist/css/bootstrap-material-design.min.css";
 //import "./govstrap/styles/govstrap.css";
 // import "./bootstrap/bootstrap.min.js";
 
+const styles = {
+    root: {
+      backgroundColor: 'red',
+    },
+};
+
 class App extends Component {
   render() {
     return (
-
         <Router>
             <Switch>
-                <Route exact path="/" component={Home} />
+                <Route exact path="/" component={Report} />
                 <Route 
                     path="/arable"
                     render={({ match: { url } }) => (

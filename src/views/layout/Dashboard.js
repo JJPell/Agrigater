@@ -10,12 +10,14 @@ class Dashboard extends Component {
  
         <div>
             <Nav></Nav>
-            <main className="row">
-                <div className="col-2">
-                    <Sidebar links={ this.props.sidebar }></Sidebar>
-                </div>
-                <div className="content col-10">
-                    {this.props.children}
+            <main className="container-fluid">
+                <div className="row">
+                    <div className={this.props.hideSidebar ? "d-none" : "col-2"}>
+                        <Sidebar links={ this.props.sidebar }></Sidebar>
+                    </div>
+                    <div className={this.props.hideSidebar ? "content col-12" : "content col-10"}>
+                        {this.props.children}
+                    </div>
                 </div>
             </main>
         </div>
