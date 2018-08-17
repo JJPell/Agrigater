@@ -12,6 +12,9 @@ export default graphql`
             breed {
                 name
             }
+            gender {
+                name
+            }
         }
     }
 

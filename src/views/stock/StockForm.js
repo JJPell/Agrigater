@@ -4,11 +4,13 @@ import _ from "lodash";
 
 import Dashboard from "../layout/Dashboard";
 
+import { Button, Paper, TextField, MenuItem, Grow, CircularProgress } from "@material-ui/core";
+
 import { compose, graphql } from "react-apollo";
 import listStockTypes from '../../queries/listStockTypes';
 import createStock from "../../mutations/createStock";
 
-import { sidebarLinks } from "./sidebar";
+import Sidebar from "./StockSidebar";
 
 
 class StockForm extends Component {
@@ -47,33 +49,52 @@ class StockForm extends Component {
 
         const listStockTypes = this.props.data.listStockTypes || [];
         const { stockType, quantity } = this.state;
+        const loaded = !this.props.data.loading;
+        const { classes } = this.props;
 
         return (
-            <Dashboard sidebar={sidebarLinks}>
-            <div className="card">
-                <div className="card-body">
-                    <h3 className="card-title">Add New Stock</h3>
-                    <hr />
-                </div>
-                <div className="card-body">
-                    <form>
-                        <div className="form-group">
-                            <label>Stock</label>
-                            <select key={this.props.data.loading ? 'notLoadedYet' : 'loaded'} name="stockType" className="form-control" value={stockType} onChange={this.handleChange.bind(this)}>
-                                {listStockTypes.map(function(stockType) {
-                                    return <option key={stockType.id} value={stockType.id}>{_.startCase(stockType.name)}</option>;
-                                })}
-                            </select>
+            <Dashboard sidebar={<Sidebar />}>
 
+                {!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} size={50} /> : null}
+                <Grow in={loaded}>
+                    <Paper className="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
+                        <div className="card-body">
+                            <h3 className="card-title">Add New Stock</h3>
+                            <hr />
                         </div>
-                        <div className="form-group">
-                            <label>Quantity</label>
-                            <input name="quantity" type="number" className="form-control" placeholder="Quantity" value={quantity} onChange={this.handleChange.bind(this)}/>
+                        <div className="card-body">
+                            <form>
+                                <div className="form-group">
+                                    <TextField
+                                    select
+                                    fullWidth
+                                    name="stockType"
+                                    label="Stock"
+                                    value={stockType}
+                                    onChange={this.handleChange.bind(this)}
+                                    >
+                                    {listStockTypes.map(stockType => (
+                                        <MenuItem key={stockType.id} value={stockType.id}>
+                                        {_.startCase(stockType.name)}
+                                        </MenuItem>
+                                    ))}
+                                    </TextField>
+                                </div>
+                                <div className="form-group">
+                                    <TextField
+                                        type="number"
+                                        fullWidth
+                                        name="quantity"
+                                        label="Quantity"
+                                        value={quantity}
+                                        onChange={this.handleChange.bind(this)}
+                                    />
+                                </div>
+                                <Button variant="contained" color="primary" onClick={this.addStock.bind(this)}>Submit</Button>
+                            </form>
                         </div>
-                        <button className="btn btn-primary" type="button" onClick={this.addStock.bind(this)}>Submit</button>
-                    </form>
-                </div>
-            </div>
+                    </Paper>
+                </Grow>
             </Dashboard>
         );
     }

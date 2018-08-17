@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import loginImg from '../../img/login-screen.jpg';
 import Form from "./Form";
 
-const Input = styled.input``;
+import { Paper } from "@material-ui/core";
 
 class SignIn extends Component {
 
@@ -25,11 +25,11 @@ class SignIn extends Component {
 				<div className="container">
 				<div className="row">
 					<div className="col-sm-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
-					<div className="card">
-						<div className="card-body">
-							<Form history={history} />
-						</div>
-					</div>
+						<Paper>
+							<div className="card-body">
+								<Form history={history} />
+							</div>
+						</Paper>
 					</div>
 				</div>
 

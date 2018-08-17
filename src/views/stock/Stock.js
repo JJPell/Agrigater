@@ -5,55 +5,50 @@ import _ from "lodash";
 
 import Dashboard from "../layout/Dashboard";
 
-import Modal from 'react-modal';
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+
+import PropTypes from 'prop-types';
+
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import withMobileDialog from '@material-ui/core/withMobileDialog';
+
+import { Button, Paper, Fade, CircularProgress } from "@material-ui/core";
 
 import { compose, graphql } from "react-apollo";
 
 import listStock from "../../queries/listStock";
 import deleteStock from "../../mutations/deleteStock";
 
-import { sidebarLinks } from "./sidebar";
+import Sidebar from "./StockSidebar";
 
-Modal.setAppElement('#root');
 
-const modalStyles = {
-	content : {
-	  top                   : '50%',
-	  left                  : '50%',
-	  right                 : 'auto',
-	  bottom                : 'auto',
-	  marginRight           : '-50%',
-	  transform             : 'translate(-50%, -50%)',
-	  border:	0,
-	  backgroundColor: "transparent"
-	}
-};
 
 class Stock extends Component {
 
 	constructor () {
 		super();
 		this.state = {
-			showModal: false,
+			showDialog: false,
 			selectedStock: null
 		};
-		
-		this.handleOpenModal = this.handleOpenModal.bind(this);
-		this.handleCloseModal = this.handleCloseModal.bind(this);
+
 	}
 	
-	handleOpenModal (stock) {
+	handleOpenDialog (stock) {
 		this.setState({ 
-			showModal: true, 
+			showDialog: true, 
 			selectedStock: stock
 		});
 	}
 	
-	handleCloseModal () {
+	handleCloseDialog () {
 		this.setState({ 
-			showModal: false,
+			showDialog: false,
 			selectedStock: null
 		});
 	}
@@ -64,7 +59,7 @@ class Stock extends Component {
 			variables: { id }
 		});
 
-		this.handleCloseModal()
+		this.handleCloseDialog()
 
 		this.props.data.refetch();
 
@@ -73,99 +68,101 @@ class Stock extends Component {
 
 	render() {
 		let tableData = this.props.data.listStock || [];
+		const { fullScreen } = this.props;
+
+		const loaded = !this.props.data.loading;
 		return (
-			<Dashboard sidebar={sidebarLinks}>
+			<Dashboard sidebar={<Sidebar />}>
 			
-				<div className="card">
 
-					<div className="card-body">
-						<h3 className="card-title">Stock</h3>
-						<hr />
-					</div>
+				{!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} size={50} /> : null}
 
-						{/* <BootstrapTable keyField='id' data={ this.props.tableData } columns={ columns } selectRow={ selectRow } hover/> */}
+				<Fade in={loaded}>
+					<div className="card">
 
-						<ReactTable
-							columns={[
-								{
-								Header: "Stock Table",
-								columns: [
-									{
-										Header: "ID",
-										accessor: "id"
-									},
-									{
-										Header: "Name",
-										accessor: "name",
-										Cell: row => {
-											return _.startCase(row.value);
-										}
-									},
-									{
-										Header: "Quantity",
-										accessor: "quantity"
-									},
-									{
-										Header: "Actions",
-										accessor: "actions",
-										sortable: false,
-										filterable: false,
-									}
-								]
-								}
-							]}
-							defaultPageSize={10}
-							className="-striped -highlight"
-							// data={this.props.tableData}
-							data={ tableData.map((prop,key) => {
-								return ({
-									...prop,
-									actions: (
-										<div className="btn-group w-100 m-0" role="group">
-										
-										<a href="#" onClick={() => this.handleOpenModal(prop)} className="btn btn-danger btn-outline-danger w-50 ml-auto"><FontAwesome name={"trash"} /> Delete</a>
-										
-										</div>
-									) 
-								})
-							})}
-						/>
-
-				</div>
-				<Modal 
-				isOpen={this.state.showModal}
-				contentLabel="onRequestClose Example"
-				onRequestClose={this.handleCloseModal}
-				shouldCloseOnOverlayClick={true}
-				style={modalStyles}
-				>
-
-					<div className="modal-dialog" role="document">
-						<div className="modal-content">
-							<div className="modal-header">
-								<h5 className="modal-title text-danger">Caution</h5>
-								<button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={this.handleCloseModal}>
-								<span aria-hidden="true">×</span>
-								</button>
-							</div>
-							<div className="modal-body">
-								<p>Are you sure you want to delete { this.state.selectedStock ? this.state.selectedStock.quantity : "this" } { this.state.selectedStock ? this.state.selectedStock.name : "" } { this.state.selectedStock ? this.state.selectedStock.name : "" }?</p>
-							</div>
-							<div className="modal-footer">
-								<button type="button" className="btn btn-danger" onClick={() => this.deleteStock(this.state.selectedStock)}>Yes</button>
-								<button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.handleCloseModal}>No</button>
-							</div>
+						<div className="card-body">
+							<h3 className="card-title">Stock</h3>
+							<hr />
 						</div>
+
+							{/* <BootstrapTable keyField='id' data={ this.props.tableData } columns={ columns } selectRow={ selectRow } hover/> */}
+
+							<ReactTable
+								columns={[
+									{
+									Header: "Stock Table",
+									columns: [
+										{
+											Header: "ID",
+											accessor: "id"
+										},
+										{
+											Header: "Name",
+											accessor: "name",
+											Cell: row => {
+												return _.startCase(row.value);
+											}
+										},
+										{
+											Header: "Quantity",
+											accessor: "quantity"
+										},
+										{
+											Header: "Actions",
+											accessor: "actions",
+											sortable: false,
+											filterable: false,
+										}
+									]
+									}
+								]}
+								defaultPageSize={10}
+								className="-striped -highlight"
+								// data={this.props.tableData}
+								data={ tableData.map((prop,key) => {
+									return ({
+										...prop,
+										actions: (
+											<div className="d-flex justify-content-center">
+												<Button className="ml-1 bg-danger" variant="contained" onClick={() => this.handleOpenDialog(prop)}>Delete</Button>
+											</div>
+										) 
+									})
+								})}
+							/>
+
 					</div>
-
-				</Modal>
-
+				</Fade>
+				<Dialog
+					fullScreen={fullScreen}
+					open={this.state.showDialog}
+					onClose={this.handleCloseDialog}
+					aria-labelledby="responsive-dialog-title"
+					>
+					<DialogTitle id="responsive-dialog-title">{"Confirm Delete"}</DialogTitle>
+					<DialogContent>
+						<DialogContentText>
+						Are you sure you want to delete { this.state.selectedStock ? this.state.selectedStock.quantity : "this" } { this.state.selectedStock ? this.state.selectedStock.name : "" } { this.state.selectedStock ? this.state.selectedStock.name : "" }?
+						</DialogContentText>
+					</DialogContent>
+					<DialogActions>
+						<Button onClick={() => this.handleCloseDialog()} color="primary">
+						No
+						</Button>
+						<Button onClick={() => this.deleteStock(this.state.selectedStock)} color="primary" autoFocus>
+						Yes
+						</Button>
+					</DialogActions>
+				</Dialog>
 
 			</Dashboard>
 		);
 	}
 }
 
+Stock.propTypes = {
+	fullScreen: PropTypes.bool.isRequired,
+};
 
 export default compose(
 	graphql(listStock, {

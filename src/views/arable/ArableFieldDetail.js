@@ -25,44 +25,32 @@ import deleteJob from "../../mutations/deleteJob";
 import Sidebar from "./ArableSidebar";
 
 
-class ArableDetail extends Component {
+class ArableFieldDetail extends Component {
 
     constructor() {
         super();
         this.state = {
 			showDialog: false,
-			selected: null
+			selectedJob: null
         };
         
     }
 
-    handleOpenDialog (fieldOrJob) {
+    handleOpenDialog (job) {
 		this.setState({ 
 			showDialog: true, 
-			selected: fieldOrJob
+			selectedJob: job
         });
 	}
 	
 	handleCloseDialog () {
 		this.setState({ 
 			showDialog: false,
-			selected: null
+			selectedJob: null
 		});
 	}
 
 	deleteJob = ({id}) => {
-
-		this.props.deleteJob({
-			variables: { id }
-		});
-
-		this.handleCloseDialog()
-
-		this.props.data.refetch();
-
-    }
-    
-    deleteLand = ({id}) => {
 
 		this.props.mutate({
 			variables: { id }
@@ -76,9 +64,10 @@ class ArableDetail extends Component {
 
     render() {
 
-        let farm = this.props.data.getFarm ? this.props.data.getFarm : {};
-        let fields = farm.fields || [];
-        let jobs = farm.jobs || [];
+        let field = this.props.data.getField ? this.props.data.getField : {};
+        let farm = field.farm || {};
+        let jobs = field.jobs || [];
+
         const { fullScreen } = this.props;
 
         const loaded = !this.props.data.loading;
@@ -87,102 +76,57 @@ class ArableDetail extends Component {
 
         const { classes } = this.props;
 
-        const { selected } = this.state;
-
         return (
             <Dashboard sidebar={<Sidebar />}>
 
                 {!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}}  size={50} /> : null}
                 <div className="row">
                     <Grow in={loaded}>
-                        <div className="col-lg-2 col-md-6 col-sm-12">
+                        <div className="col-lg-4 col-md-4 col-sm-12">
                             <div className="card">
                                 <div className="card-header">
-                                    <h3 className="card-title">{farm.name} Detail</h3>
+                                    <h3 className="card-title">{field.name} Detail</h3>
                                 </div>
                                 <table className="table">
-                                    <tr>
-                                        <th>Size</th>
-                                        <td>{farm.size || "Unknown"}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Seed Cost</th>
-                                        <td>{farm.seedCost ? farm.seedCost.toFixed(2) : "0.00"}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Fertiliser Cost</th>
-                                        <td>{farm.fertiliserCost ? farm.fertiliserCost.toFixed(2) : "0.00"}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Lime Cost</th>
-                                        <td>{farm.limeCost ? farm.limeCost.toFixed(2) : "0.00"}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Spray Cost</th>
-                                        <td>{farm.sprayCost ? farm.sprayCost.toFixed(2) : "0.00"}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Cultivation Cost</th>
-                                        <td>{farm.cultivationCost ? farm.cultivationCost.toFixed(2) : "0.00"}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Licence Cost</th>
-                                        <td>{farm.licenceCost ? farm.licenceCost.toFixed(2) : "0.00"}</td>
-                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <th>Size</th>
+                                            <td>{field.size || "Unknown"}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Seed Cost</th>
+                                            <td>{field.seedCost ? field.seedCost.toFixed(2) : "0.00"}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Fertiliser Cost</th>
+                                            <td>{field.fertiliserCost ? field.fertiliserCost.toFixed(2) : "0.00"}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Lime Cost</th>
+                                            <td>{field.limeCost ? field.limeCost.toFixed(2) : "0.00"}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Spray Cost</th>
+                                            <td>{field.sprayCost ? field.sprayCost.toFixed(2) : "0.00"}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Cultivation Cost</th>
+                                            <td>{field.cultivationCost ? field.cultivationCost.toFixed(2) : "0.00"}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Licence Cost</th>
+                                            <td>{field.licenceCost ? field.licenceCost.toFixed(2) : "0.00"}</td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
                     </Grow>
                     <Grow in={loaded}>
-                        <div className="col-lg-5 col-md-6 col-sm-12">
+                        <div className="col-lg-8 col-md-8 col-sm-12">
                             <div className="card">
                                 <div className="card-header">
-                                    <h3 className="card-title">{farm.name} Fields</h3>
-                                </div>
-                                <ReactTable
-                                    data={ fields.map((prop,key) => {
-                                        return ({
-                                            ...prop,
-                                            actions: (
-                                                <div className="d-flex justify-content-center">
-                                                    <Link to={"field/"+prop["id"]} ><Button color="default" variant="contained">Detail</Button></Link>
-                                                    <Button className="ml-1 bg-danger" variant="contained" onClick={() => this.handleOpenDialog(prop)}>Delete</Button>
-                                                </div>
-                                            ) 
-                                        })
-                                    })}
-                                    columns={[
-                                        {
-                                            columns: [
-                                                {
-                                                    Header: "Name",
-                                                    accessor: "name"
-                                                },
-                                                {
-                                                    Header: "Size",
-                                                    accessor: "size",
-                                                    Cell: row => row.value.toFixed(2)
-                                                },
-                                                {
-                                                    Header: "Actions",
-                                                    accessor: "actions",
-                                                    sortable: false,
-                                                    filterable: false,
-                                                }
-                                            ]
-                                        }
-                                    ]}
-                                    defaultPageSize={10}
-                                    className="-striped -highlight"
-                                />
-                            </div>
-                        </div>
-                    </Grow>
-                    <Grow in={loaded}>
-                        <div className="col-lg-5 col-md-6 col-sm-12">
-                            <div className="card">
-                                <div className="card-header">
-                                    <h3 className="card-title">{farm.name} Jobs</h3>
+                                    <h3 className="card-title">{field.name} Jobs</h3>
                                 </div>
                                 <ReactTable
                                     data={ jobs.map((prop,key) => {
@@ -190,7 +134,8 @@ class ArableDetail extends Component {
                                             ...prop,
                                             actions: (
                                                 <div className="d-flex justify-content-center">
-                                                    <Button className="bg-danger" variant="contained" onClick={() => this.handleOpenDialog(prop)}>Delete</Button>
+                                                    <Link to={"field/"+prop["id"]} ><Button color="default" variant="contained">Detail</Button></Link>
+                                                    <Button className="ml-1 bg-danger" variant="contained" onClick={() => this.handleOpenDialog(prop)}>Delete</Button>
                                                 </div>
                                             ) 
                                         })
@@ -231,14 +176,14 @@ class ArableDetail extends Component {
 					<DialogTitle id="responsive-dialog-title">{"Confirm Delete"}</DialogTitle>
 					<DialogContent>
 						<DialogContentText>
-						Are you sure you want to delete this?
+						Are you sure you want to delete this field?
 						</DialogContentText>
 					</DialogContent>
 					<DialogActions>
 						<Button onClick={() => this.handleCloseDialog()} color="primary">
 						No
 						</Button>
-						<Button onClick={(selected && selected.date) ? (() => this.deleteJob(selected)) : (() => this.deleteField(selected))} color="primary" autoFocus>
+						<Button onClick={() => this.deleteJob(this.state.selectedJob)} color="primary" autoFocus>
 						Yes
 						</Button>
 					</DialogActions>
@@ -252,12 +197,12 @@ class ArableDetail extends Component {
 export default compose(
     graphql(gql`
     
-        query getFarm(
+        query getField(
             $id: ID!
         ) {
-            getFarm(
+            getField(
                 id: $id
-            ){
+            ) {
                 id
                 name
                 size
@@ -267,7 +212,7 @@ export default compose(
                 sprayCost
                 cultivationCost
                 licenceCost
-                fields {
+                farm {
                     id
                     name
                     size
@@ -280,6 +225,7 @@ export default compose(
                     }
                 }
             }
+            
         }
     
     `, {
@@ -291,14 +237,5 @@ export default compose(
         })
     }),
     graphql(deleteJob, {
-        name: "deleteJob"
-    }),
-    graphql(gql`
-        mutation deleteLand($id: ID!) {
-            deleteLand(id: $id)
-        }
-    `, {
-    }, {
-        name: "deleteLand"
     })
-)(ArableDetail);
+)(ArableFieldDetail);

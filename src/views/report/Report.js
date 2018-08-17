@@ -5,11 +5,24 @@ import _ from "lodash";
 
 import Dashboard from "../layout/Dashboard";
 
+import PropTypes from 'prop-types';
+import { Paper, Button, Grow, CircularProgress } from "@material-ui/core";
+import { withStyles } from '@material-ui/core/styles';
+
 import { compose, graphql } from "react-apollo";
 import gql from "graphql-tag";
 
+const styles = theme => ({
+	root: {
+	  ...theme.mixins.gutters(),
+	  paddingTop: theme.spacing.unit * 2,
+	  paddingBottom: theme.spacing.unit * 2,
+	},
+  });
 
 class Report extends Component {
+
+	
 
 	calculateTotal(land) {
 
@@ -57,6 +70,8 @@ class Report extends Component {
 
 	render() {
 		
+		const { classes } = this.props;
+
 		const lands = this.props.listLands.listLands || [];
 		const animals = this.props.listAnimals.listAnimals || [];
 		const animalTypes = animals ? this.listAnimalTypes(animals) : [];
@@ -68,175 +83,180 @@ class Report extends Component {
 
 		console.log(this.props);
 
+		const loaded = !this.props.listLands.loading && !this.props.listAnimals.loading && !this.props.listStock.loading;
+
 		return (
 			<Dashboard hideSidebar={true}>
+				{!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} className={classes.progress} size={50} /> : null}
 				<br />
-				<div className="container">
-					<div className="row">
-						<div className="ml-auto">
-							<button className="btn btn-primary btn-outline">Create as PDF</button>
+				<Grow in={loaded}>
+					<div className="col-xs-12 offset-sm-1 col-sm-10 offset-md-2 col-md-8 offset-lg-3 col-lg-6">
+						<div className="d-flex flex-row-reverse">
+							<Button variant="outlined" className="">Create as PDF</Button>
 						</div>
-					</div>
-				</div>
-				<div className="container card">
+						<Paper elevation={1}>
+							<div className="card-body">
+								<h3 className="h3 font-weight-bold">Valuation Report</h3>
+								<hr />
+								<h5 className="font-weight-bold">Work in Progress to Growing Crops</h5>
+								<p>The following if a breakdown of all growing crops and the work that has been put in to get to this stage.</p>
+								<br />
+								{lands.map(land => {
 
-					<div className="card-body">
-						<h3 className="h3 font-weight-bold">Valuation Report</h3>
-						<hr />
-						<h5 className="font-weight-bold">Work in Progress to Growing Crops</h5>
-						<p>The following if a breakdown of all growing crops and the work that has been put in to get to this stage.</p>
-						<br />
-						{lands.map(land => {
+									arableTotalValue += parseFloat(this.calculateTotal(land));
 
-							arableTotalValue += parseFloat(this.calculateTotal(land));
-
-							return <Fragment key={land.id} >
+									return <Fragment key={land.id} >
 
 
-								<h6 className="font-weight-bold">{land.name}</h6>
-								<p>{land.name} is {land.size} acres in size.</p>
+										<h6 className="font-weight-bold">{land.name}</h6>
+										<p>{land.name} is {land.size} acres in size.</p>
+										<table className="table table-responsize">
+											<tbody>
+												<tr>
+													<td className="col-6">Seed</td>
+													<td className="col-6">£{land.seedCost ? land.seedCost.toFixed(2) : "0.00"}</td>
+												</tr>
+												<tr>
+													<td className="col-6">Fertiliser</td>
+													<td className="col-6">£{land.fertiserCost ? land.fertiserCost.toFixed(2) : "0.00"}</td>
+												</tr>
+												<tr>
+													<td className="col-6">Lime</td>
+													<td className="col-6">£{land.limeCost ? land.limeCost.toFixed(2) : "0.00"}</td>
+												</tr>
+												<tr>
+													<td className="col-6">Sprays</td>
+													<td className="col-6">£{land.sprayCost ? land.sprayCost.toFixed(2) : "0.00"}</td>
+												</tr>
+												<tr>
+													<td className="col-6">Cultivations</td>
+													<td className="col-6">£{land.cultivationCost ? land.cultivationCost.toFixed(2) : "0.00"}</td>
+												</tr>
+												<tr>
+													<td className="col-6">Licence Fees</td>
+													<td className="col-6">£{land.licenceCost ? land.licenceCost.toFixed(2) : "0.00"}</td>
+												</tr>
+											</tbody>
+											<tfoot>
+												<tr>
+													<th className="col-6"></th>
+													<th className="col-6">£{this.calculateTotal(land)}</th>
+												</tr>
+											</tfoot>
+										</table>
+										<br />
+
+									</Fragment>
+
+								})}
 								<table className="table table-responsize">
-									<tbody>
-										<tr>
-											<td className="col-6">Seed</td>
-											<td className="col-6">£{land.seedCost ? land.seedCost.toFixed(2) : "0.00"}</td>
-										</tr>
-										<tr>
-											<td className="col-6">Fertiliser</td>
-											<td className="col-6">£{land.fertiserCost ? land.fertiserCost.toFixed(2) : "0.00"}</td>
-										</tr>
-										<tr>
-											<td className="col-6">Lime</td>
-											<td className="col-6">£{land.limeCost ? land.limeCost.toFixed(2) : "0.00"}</td>
-										</tr>
-										<tr>
-											<td className="col-6">Sprays</td>
-											<td className="col-6">£{land.sprayCost ? land.sprayCost.toFixed(2) : "0.00"}</td>
-										</tr>
-										<tr>
-											<td className="col-6">Cultivations</td>
-											<td className="col-6">£{land.cultivationCost ? land.cultivationCost.toFixed(2) : "0.00"}</td>
-										</tr>
-										<tr>
-											<td className="col-6">Licence Fees</td>
-											<td className="col-6">£{land.licenceCost ? land.licenceCost.toFixed(2) : "0.00"}</td>
-										</tr>
-									</tbody>
 									<tfoot>
 										<tr>
 											<th className="col-6"></th>
-											<th className="col-6">£{this.calculateTotal(land)}</th>
+											<th className="col-6">£{arableTotalValue ? arableTotalValue.toFixed(2) : "0.00"}</th>
 										</tr>
 									</tfoot>
 								</table>
+
+								<h5 className="font-weight-bold">Livestock</h5>
+								<p>The following is a breakdown of all livestock and their associated value.</p>
+								<br />
+								{animalTypes.map(animalTypeName => {
+
+
+									
+
+									return <Fragment key={animalTypeName} >
+
+										<h6 className="font-weight-bold">{_.startCase(animalTypeName)}</h6>
+										<table className="table table-responsize">
+											<tbody>
+												
+												{animals.map(animal => {
+
+													if(animal.type.name === animalTypeName) {
+
+													livestockTotalValue += (animal.quantity*animal.value);
+
+													return 	<tr key={animal.id}>
+																<td className="col-6">{animal.quantity}x {_.startCase(animal.breed.name) + " " +_.startCase(animal.gender.name) + (animal.quantity > 1 ? "s" : "")}</td>
+																<td className="col-6">£{(animal.quantity*animal.value).toFixed(2)}</td>
+															</tr>
+
+													}
+
+												})}
+											</tbody>
+											<tfoot>
+												<tr>
+													<th className="col-6"></th>
+													<th className="col-6">£{livestockTotalValue.toFixed(2)}</th>
+												</tr>
+											</tfoot>
+										</table>
+										<br />
+
+									</Fragment>
+
+									})}
+								<h5 className="font-weight-bold">Stock</h5>
+								<p>The following is a breakdown of all stock, quantity and associated value.</p>
 								<br />
 
-							</Fragment>
 
-						})}
-						<table className="table table-responsize">
-							<tfoot>
-								<tr>
-									<th className="col-6"></th>
-									<th className="col-6">£{arableTotalValue ? arableTotalValue.toFixed(2) : "0.00"}</th>
-								</tr>
-							</tfoot>
-						</table>
-
-						<h5 className="font-weight-bold">Livestock</h5>
-						<p>The following is a breakdown of all livestock and their associated value.</p>
-						<br />
-						{animalTypes.map(animalTypeName => {
-
-
-							
-
-							return <Fragment key={animalTypeName} >
-
-								<h6 className="font-weight-bold">{_.startCase(animalTypeName)}</h6>
+			
 								<table className="table table-responsize">
 									<tbody>
-										
-										{animals.map(animal => {
+										{listStock.map(stock => {
 
-											if(animal.type.name === animalTypeName) {
+											stockTotalValue += (stock.value * stock.quantity);
 
-											livestockTotalValue += (animal.quantity*animal.value);
-
-											return 	<tr key={animal.id}>
-														<td className="col-6">{animal.quantity}x {_.startCase(animal.breed.name) + " " +_.startCase(animal.gender.name) + (animal.quantity > 1 ? "s" : "")}</td>
-														<td className="col-6">£{(animal.quantity*animal.value).toFixed(2)}</td>
+											return 	<tr key={stock.id}>
+														<td className="col-6">{stock.quantity}x {_.startCase(stock.name)}</td>
+														<td className="col-6">£{(stock.value * stock.quantity).toFixed(2)}</td>
 													</tr>
 
-											}
+											
 
 										})}
 									</tbody>
 									<tfoot>
 										<tr>
 											<th className="col-6"></th>
-											<th className="col-6">£{livestockTotalValue.toFixed(2)}</th>
+											<th className="col-6">£{stockTotalValue.toFixed(2)}</th>
 										</tr>
 									</tfoot>
 								</table>
 								<br />
-
-							</Fragment>
-
-							})}
-						<h5 className="font-weight-bold">Stock</h5>
-						<p>The following is a breakdown of all stock, quantity and associated value.</p>
-						<br />
-
-
-	
-						<table className="table table-responsize">
-							<tbody>
-								{listStock.map(stock => {
-
-									stockTotalValue += (stock.value * stock.quantity);
-
-									return 	<tr key={stock.id}>
-												<td className="col-6">{stock.quantity}x {_.startCase(stock.name)}</td>
-												<td className="col-6">£{(stock.value * stock.quantity).toFixed(2)}</td>
-											</tr>
-
-									
-
-								})}
-							</tbody>
-							<tfoot>
-								<tr>
-									<th className="col-6"></th>
-									<th className="col-6">£{stockTotalValue.toFixed(2)}</th>
-								</tr>
-							</tfoot>
-						</table>
-						<br />
-						<table className="table table-responsize">
-							<tfoot>
-								<tr>
-									<th className="col-6"></th>
-									<th className="col-6">£{(arableTotalValue + livestockTotalValue + stockTotalValue).toFixed(2)}</th>
-								</tr>
-							</tfoot>
-						</table>
+								<table className="table table-responsize">
+									<tfoot>
+										<tr>
+											<th className="col-6"></th>
+											<th className="col-6">£{(arableTotalValue + livestockTotalValue + stockTotalValue).toFixed(2)}</th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+						</Paper>
 					</div>
-				</div>
+				</Grow>
 				<br />
 				<br />
 				<br />
 				<br />
 				<br />
 				<br />
-
+				
 			</Dashboard>
 		);
 	}
 }
 
+Report.propTypes = {
+	classes: PropTypes.object.isRequired,
+};
 
-export default compose(
+export default withStyles(styles)(compose(
 	graphql(gql`
 
 		query {
@@ -297,4 +317,4 @@ export default compose(
 	`, {
 		name: "listStock"
 	})
-)(Report);
+)(Report));

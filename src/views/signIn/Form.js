@@ -3,6 +3,9 @@ import { graphql } from "react-apollo";
 import getToken from "../../queries/getToken";
 
 
+import { TextField, Button, Typography } from "@material-ui/core";
+
+
 class Form extends Component {
 
 	state = {
@@ -47,29 +50,39 @@ class Form extends Component {
 		return (
 			
             <form className="form">
-                <h1 className="form-signin-heading">Sign In</h1>
+                <Typography variant="display2">Sign In</Typography>
+				<br />
                 <label htmlFor="input-email" className="sr-only" >Email</label>
-                <input
-                    className="form-control"
+                <TextField
+                    fullWidth
                     name="email"
                     onChange={inputChange}
                     value={email}
-                    placeholder="Email"
-                />						
+					label="Email"
+					autoComplete="current-email"
+                />
+				<br />
+				<br />						
                 <label htmlFor="input-password" className="sr-only" >Password</label>
-                <input
-                    className="form-control"
-                    name="password"
+                <TextField
+                    fullWidth
+					label="Password"
+					name="password"
+					type="password"
                     onChange={inputChange}
                     value={password}
-                    type="password"
-                    placeholder="Password"
+                    autoComplete="current-password"
+    
                 />
-                <button className="btn btn-primary btn-block" type="button" onClick={signIn}>Sign In</button>
+				<br />
+				<br />
+                <Button color="primary" variant="contained" fullWidth onClick={signIn}>Sign In</Button>
                 <span className="text-danger" />
+				<br />
                 <hr />
-                <h3>Haven't got an account?</h3>
-                <a href="/signup" className="btn btn-primary btn-block">Sign Up</a>
+
+                <Typography variant="subheading">Haven't got an account?</Typography>
+                <Button variant="contained" diabled fullWidth>Sign Up</Button>
             </form>
 
 		)

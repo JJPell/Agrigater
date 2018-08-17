@@ -5,8 +5,19 @@ export default graphql`
     query {
         listLands {
             id
-            size
             name
+            size
+            seedCost
+            fertiliserCost
+            limeCost
+            sprayCost
+            cultivationCost
+            licenceCost
+            jobs {
+                type {
+                    name
+                }
+            }
         }
     }
     
