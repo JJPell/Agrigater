@@ -26,6 +26,7 @@ import deleteStock from "../../mutations/deleteStock";
 
 import Sidebar from "./StockSidebar";
 
+import { isAuthenticated, isToken } from "../../Auth";
 
 
 class Stock extends Component {
@@ -37,6 +38,10 @@ class Stock extends Component {
 			selectedStock: null
 		};
 
+	}
+	
+	componentWillMount() {
+		isToken(this);
 	}
 	
 	handleOpenDialog (stock) {
@@ -67,12 +72,14 @@ class Stock extends Component {
 	}
 
 	render() {
+		
+		isAuthenticated(this);
 		let tableData = this.props.data.listStock || [];
 		const { fullScreen } = this.props;
 
 		const loaded = !this.props.data.loading;
 		return (
-			<Dashboard sidebar={<Sidebar />}>
+			<Dashboard sidebar={<Sidebar />} history={this.props.history}>
 			
 
 				{!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} size={50} /> : null}
@@ -160,9 +167,6 @@ class Stock extends Component {
 	}
 }
 
-Stock.propTypes = {
-	fullScreen: PropTypes.bool.isRequired,
-};
 
 export default compose(
 	graphql(listStock, {

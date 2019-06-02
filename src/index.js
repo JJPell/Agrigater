@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './styles/index.css';
+
 import App from './App';
 
 import { ApolloClient } from 'apollo-client';
@@ -9,10 +9,16 @@ import { setContext } from 'apollo-link-context';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
 import { ApolloProvider as Provider } from "react-apollo";
+import config from "./config";
+import './styles/index.css';
+
+window.acresInHectare = 2.47105;
 
 const httpLink = createHttpLink({
-    uri: 'http://localhost:8080/graphql',
+    uri: config.api + '/graphql',
 });
+
+
  
 const authLink = setContext((_, { headers }) => {
     // get the authentication token from local storage if it exists

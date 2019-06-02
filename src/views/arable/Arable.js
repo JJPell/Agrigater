@@ -26,6 +26,8 @@ import deleteLand from "../../mutations/deleteLand";
 
 import Sidebar from "./ArableSidebar";
 
+import { isAuthenticated, isToken } from "../../Auth";
+
 const modalStyles = {
 	content : {
 	  top                   : '50%',
@@ -39,6 +41,7 @@ const modalStyles = {
 	}
 };
 
+
 class Arable extends Component {
 
 	constructor () {
@@ -48,6 +51,10 @@ class Arable extends Component {
 			selectedLand: null
 		};
 
+	}
+
+	componentWillMount() {
+		isToken(this);
 	}
 	
 	handleOpenDialog (land) {
@@ -78,6 +85,9 @@ class Arable extends Component {
 	}
 
 	render() {
+
+		isAuthenticated(this);
+
 		let tableData = this.props.data.listFarms || [];
 		const { fullScreen } = this.props;
 
@@ -186,11 +196,6 @@ class Arable extends Component {
 		);
 	}
 }
-
-Arable.propTypes = {
-	fullScreen: PropTypes.bool.isRequired,
-};
-
 
 export default compose(
 	graphql(gql`

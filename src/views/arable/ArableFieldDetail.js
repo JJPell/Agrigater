@@ -24,6 +24,8 @@ import deleteJob from "../../mutations/deleteJob";
 
 import Sidebar from "./ArableSidebar";
 
+import { isAuthenticated, isToken } from "../../Auth";
+
 
 class ArableFieldDetail extends Component {
 
@@ -35,6 +37,10 @@ class ArableFieldDetail extends Component {
         };
         
     }
+    
+	componentWillMount() {
+		isToken(this);
+	}
 
     handleOpenDialog (job) {
 		this.setState({ 
@@ -63,6 +69,8 @@ class ArableFieldDetail extends Component {
 	}
 
     render() {
+        
+		isAuthenticated(this);
 
         let field = this.props.data.getField ? this.props.data.getField : {};
         let farm = field.farm || {};
@@ -77,7 +85,7 @@ class ArableFieldDetail extends Component {
         const { classes } = this.props;
 
         return (
-            <Dashboard sidebar={<Sidebar />}>
+            <Dashboard sidebar={<Sidebar />} history={this.props.history}>
 
                 {!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}}  size={50} /> : null}
                 <div className="row">

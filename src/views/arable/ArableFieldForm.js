@@ -7,9 +7,11 @@ import gql from "graphql-tag";
 
 import createLand from "../../mutations/createLand";
 
-import {Button, Paper, TextField, Select, Input, MenuItem, Grow, CircularProgress} from '@material-ui/core';
+import {Button, Paper, TextField, Select, Input, OutlinedInput, MenuItem, Grow, CircularProgress} from '@material-ui/core';
 
 import Sidebar from "./ArableSidebar";
+
+import { isAuthenticated, isToken } from "../../Auth";
 
 class ArableFieldForm extends Component {
 
@@ -26,6 +28,10 @@ class ArableFieldForm extends Component {
         licenceCost: "",
         validationErrors: {}
     }
+    
+	componentWillMount() {
+		isToken(this);
+	}
 
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
@@ -73,10 +79,9 @@ class ArableFieldForm extends Component {
 
     addArable(event) {
 
-        const hectaresPerAcres = 0.404686;
         let input = {
             name:                   this.state.name,
-            size:                   this.state.sizeUnit === "acres" ? (this.state.size * hectaresPerAcres) : this.state.size,
+            size:                   this.state.sizeUnit === "acres" ? (this.state.size / window.acresInHectare) : this.state.size,
             parent:                 this.state.parent,
             seedCost:               this.state.seedCost,
             fertiliserCost:         this.state.fertiliserCost,
@@ -102,6 +107,8 @@ class ArableFieldForm extends Component {
     }
 
     render() {
+        
+		isAuthenticated(this);
 
         const farms = this.props.data.listFarms || [];
 
@@ -124,7 +131,7 @@ class ArableFieldForm extends Component {
         console.log(this.props)
 
         return (
-            <Dashboard sidebar={<Sidebar />}>
+            <Dashboard sidebar={<Sidebar />} history={this.props.history}>
 
                 {!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} size={50} /> : null}
 
@@ -133,18 +140,15 @@ class ArableFieldForm extends Component {
                         <div className="card-body">
                             <h3 className="card-title">Create a New Field</h3>
                             <hr />
-                        </div>
-                        <div className="card-body">
                             <form>
                                 <div className="row">
-                                    <div className="col-sm-12 col-md-6">
+                                    <div className="col-sm-12">
                                         <h5>Field belongs to...</h5>
                                         <div className="form-group">
                                             <Select
                                                 value={parent}
                                                 onChange={this.handleChange.bind(this)}
-                                                input={<Input name="parent" />}
-                                                className="mt-3"
+                                                input={<OutlinedInput name="parent" />}
                                                 fullWidth
                                                 helperText={validationErrors.parent}
                                                 error={validationErrors.parent ? true:false}
@@ -167,6 +171,7 @@ class ArableFieldForm extends Component {
                                                 onChange={this.handleChange.bind(this)}
                                                 helperText={validationErrors.name}
                                                 error={validationErrors.name ? true:false}
+                                                variant="outlined"
                                             />
                                         </div>
                                         <div className="row">
@@ -181,6 +186,7 @@ class ArableFieldForm extends Component {
                                                         fullWidth
                                                         helperText={validationErrors.size}
                                                         error={validationErrors.size ? true:false}
+                                                        variant="outlined"
                                                     />
                                                 </div>
                                             </div>
@@ -189,8 +195,7 @@ class ArableFieldForm extends Component {
                                                     <Select
                                                         value={sizeUnit}
                                                         onChange={this.handleChange.bind(this)}
-                                                        input={<Input name="sizeUnit" />}
-                                                        className="mt-3"
+                                                        input={<OutlinedInput name="sizeUnit" />}
                                                         fullWidth
                                                     >
                                                         <MenuItem value={"hectares"}>Hectares</MenuItem>
@@ -200,8 +205,12 @@ class ArableFieldForm extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-sm-12 col-md-6">
+                                </div>
+                                <div className="row">
+                                    <div className="col-sm-12">
                                         <h5>Costs</h5>
+                                    </div>
+                                    <div className="col-sm-12 col-md-6">
                                         <div className="form-group">
                                             <TextField
                                                 name="seedCost"
@@ -210,8 +219,11 @@ class ArableFieldForm extends Component {
                                                 value={seedCost}
                                                 onChange={this.handleChange.bind(this)}
                                                 fullWidth
+                                                variant="outlined"
                                             />
                                         </div>
+                                    </div>
+                                    <div className="col-sm-12 col-md-6">
                                         <div className="form-group">
                                             <TextField
                                                 name="fertiliserCost"
@@ -220,8 +232,11 @@ class ArableFieldForm extends Component {
                                                 value={fertiliserCost}
                                                 onChange={this.handleChange.bind(this)}
                                                 fullWidth
+                                                variant="outlined"
                                             />
                                         </div>
+                                    </div>
+                                    <div className="col-sm-12 col-md-6">
                                         <div className="form-group">
                                             <TextField
                                                 name="limeCost"
@@ -230,8 +245,11 @@ class ArableFieldForm extends Component {
                                                 value={limeCost}
                                                 onChange={this.handleChange.bind(this)}
                                                 fullWidth
+                                                variant="outlined"
                                             />
                                         </div>
+                                    </div>
+                                    <div className="col-sm-12 col-md-6">
                                         <div className="form-group">
                                             <TextField
                                                 name="sprayCost"
@@ -240,8 +258,11 @@ class ArableFieldForm extends Component {
                                                 value={sprayCost}
                                                 onChange={this.handleChange.bind(this)}
                                                 fullWidth
+                                                variant="outlined"
                                             />
                                         </div>
+                                    </div>
+                                    <div className="col-sm-12 col-md-6">
                                         <div className="form-group">
                                             <TextField
                                                 name="cultivationCost"
@@ -250,8 +271,11 @@ class ArableFieldForm extends Component {
                                                 value={cultivationCost}
                                                 onChange={this.handleChange.bind(this)}
                                                 fullWidth
+                                                variant="outlined"
                                             />
                                         </div>
+                                    </div>
+                                    <div className="col-sm-12 col-md-6">
                                         <div className="form-group">
                                             <TextField
                                                 name="licenceCost"
@@ -260,6 +284,7 @@ class ArableFieldForm extends Component {
                                                 value={licenceCost}
                                                 onChange={this.handleChange.bind(this)}
                                                 fullWidth
+                                                variant="outlined"
                                             />
                                         </div>
                                     </div>

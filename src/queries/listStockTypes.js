@@ -6,6 +6,8 @@ export default graphql`
         listStockTypes {
             id
             name
+            unit
+            value
         }
     }
 

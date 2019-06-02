@@ -12,6 +12,12 @@ import { withStyles } from '@material-ui/core/styles';
 import { compose, graphql } from "react-apollo";
 import gql from "graphql-tag";
 
+import { isAuthenticated, isToken } from "../../Auth";
+
+import numberal from "numeral";
+const NUMBER_FORMAT = '0,0.00';
+
+
 const styles = theme => ({
 	root: {
 	  ...theme.mixins.gutters(),
@@ -21,34 +27,6 @@ const styles = theme => ({
   });
 
 class Report extends Component {
-
-	
-
-	calculateTotal(land) {
-
-		let total = 0;
-		if(land.seedCost) {
-			total += land.seedCost;
-		}
-		if(land.fertiserCost) {
-			total += land.fertiserCost;
-		}
-		if(land.limeCost) {
-			total += land.limeCost;
-		}
-		if(land.sprayCost) {
-			total += land.sprayCost;
-		}
-		if(land.cultivationCost) {
-			total += land.sprayCost;
-		}
-		if(land.licenceCost) {
-			total += land.sprayCost;
-		}
-
-		return total.toFixed(2);
-
-	}
 
 	listAnimalTypes(listAnimals) {
 
@@ -69,252 +47,174 @@ class Report extends Component {
 	}
 
 	render() {
-		
+
 		const { classes } = this.props;
 
-		const lands = this.props.listLands.listLands || [];
-		const animals = this.props.listAnimals.listAnimals || [];
+		console.log(this.props)
+
+		let lands = this.props.farms ? this.props.farms : [];
+		const animals = this.props.animals ? this.props.animals : [];
 		const animalTypes = animals ? this.listAnimalTypes(animals) : [];
-		const listStock = this.props.listStock.listStock || [];
+		const listStock = this.props.stock ? this.props.stock : [];
 
 		let arableTotalValue = 0;
 		let livestockTotalValue = 0;
 		let stockTotalValue = 0;
 
-		console.log(this.props);
-
-		const loaded = !this.props.listLands.loading && !this.props.listAnimals.loading && !this.props.listStock.loading;
+		//const loaded = !this.props.listFarms.loading && !this.props.listAnimals.loading && !this.props.listStock.loading;
 
 		return (
-			<Dashboard hideSidebar={true}>
-				{!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} className={classes.progress} size={50} /> : null}
+
+			<div className="card-body">
+				<h3 className="h3 font-weight-bold">Valuation Report</h3>
+				<hr />
+				<h5 className="font-weight-bold">Work in Progress to Growing Crops</h5>
+				<p>The following if a breakdown of all growing crops and the work that has been put in to get to this stage.</p>
 				<br />
-				<Grow in={loaded}>
-					<div className="col-xs-12 offset-sm-1 col-sm-10 offset-md-2 col-md-8 offset-lg-3 col-lg-6">
-						<div className="d-flex flex-row-reverse">
-							<Button variant="outlined" className="">Create as PDF</Button>
-						</div>
-						<Paper elevation={1}>
-							<div className="card-body">
-								<h3 className="h3 font-weight-bold">Valuation Report</h3>
-								<hr />
-								<h5 className="font-weight-bold">Work in Progress to Growing Crops</h5>
-								<p>The following if a breakdown of all growing crops and the work that has been put in to get to this stage.</p>
-								<br />
-								{lands.map(land => {
+				{lands.map(land => {
 
-									arableTotalValue += parseFloat(this.calculateTotal(land));
+					arableTotalValue += land.costTotal;
 
-									return <Fragment key={land.id} >
+					return <div key={land.id} className="page-break-avoid">
 
 
-										<h6 className="font-weight-bold">{land.name}</h6>
-										<p>{land.name} is {land.size} acres in size.</p>
-										<table className="table table-responsize">
-											<tbody>
-												<tr>
-													<td className="col-6">Seed</td>
-													<td className="col-6">£{land.seedCost ? land.seedCost.toFixed(2) : "0.00"}</td>
-												</tr>
-												<tr>
-													<td className="col-6">Fertiliser</td>
-													<td className="col-6">£{land.fertiserCost ? land.fertiserCost.toFixed(2) : "0.00"}</td>
-												</tr>
-												<tr>
-													<td className="col-6">Lime</td>
-													<td className="col-6">£{land.limeCost ? land.limeCost.toFixed(2) : "0.00"}</td>
-												</tr>
-												<tr>
-													<td className="col-6">Sprays</td>
-													<td className="col-6">£{land.sprayCost ? land.sprayCost.toFixed(2) : "0.00"}</td>
-												</tr>
-												<tr>
-													<td className="col-6">Cultivations</td>
-													<td className="col-6">£{land.cultivationCost ? land.cultivationCost.toFixed(2) : "0.00"}</td>
-												</tr>
-												<tr>
-													<td className="col-6">Licence Fees</td>
-													<td className="col-6">£{land.licenceCost ? land.licenceCost.toFixed(2) : "0.00"}</td>
-												</tr>
-											</tbody>
-											<tfoot>
-												<tr>
-													<th className="col-6"></th>
-													<th className="col-6">£{this.calculateTotal(land)}</th>
-												</tr>
-											</tfoot>
-										</table>
-										<br />
+						<h6 className="font-weight-bold">{land.name}</h6>
+						<p>{land.name} is {land.size} hectares or {(land.size * window.acresInHectare).toFixed(0)} acres in size.</p>
+	
+						<table className="table table-responsize">
+							<tbody>
+								<tr>
+									<td className="col-6">Seed</td>
+									<td className="col-6 text-right">£{numberal(land.seedCostTotal).format(NUMBER_FORMAT)}</td>
+								</tr>
+								<tr>
+									<td className="col-6">Fertiliser</td>
+									<td className="col-6 text-right">£{numberal(land.fertiliserCostTotal).format(NUMBER_FORMAT)}</td>
+								</tr>
+								<tr>
+									<td className="col-6">Lime</td>
+									<td className="col-6 text-right">£{numberal(land.limeCostTotal).format(NUMBER_FORMAT)}</td>
+								</tr>
+								<tr>
+									<td className="col-6">Sprays</td>
+									<td className="col-6 text-right">£{numberal(land.sprayCostTotal).format(NUMBER_FORMAT)}</td>
+								</tr>
+								<tr>
+									<td className="col-6">Cultivations</td>
+									<td className="col-6 text-right">£{numberal(land.cultivationCostTotal).format(NUMBER_FORMAT)}</td>
+								</tr>
+								<tr>
+									<td className="col-6">Licence Fees</td>
+									<td className="col-6 text-right">£{numberal(land.licenceCostTotal).format(NUMBER_FORMAT)}</td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<th className="col-6"></th>
+									<th className="col-6 text-right">£{numberal(land.costTotal).format(NUMBER_FORMAT)}</th>
+								</tr>
+							</tfoot>
+						</table>
+						<br />
 
-									</Fragment>
+					</div>
+
+				})}
+				<table className="table table-responsize page-break-avoid">
+					<tfoot>
+						<tr>
+							<th className="col-6"></th>
+							<th className="col-6">£{numberal(arableTotalValue).format(NUMBER_FORMAT)}</th>
+						</tr>
+					</tfoot>
+				</table>
+				<div className="page-break-avoid">
+				<h5 className="font-weight-bold">Livestock</h5>
+				<p>The following is a breakdown of all livestock and their associated value.</p>
+				<br />
+				{animalTypes.map(animalTypeName => {
+
+
+					
+
+					return <div key={animalTypeName} className="page-break-avoid">
+
+						<h6 className="font-weight-bold">{_.startCase(animalTypeName)}</h6>
+						<table className="table table-responsize">
+							<tbody>
+								
+								{animals.map(animal => {
+
+									if(animal.type.name === animalTypeName) {
+
+									livestockTotalValue += (animal.quantity*animal.value);
+
+									return 	<tr key={animal.id}>
+												<td className="col-6">{animal.quantity}x {_.startCase(animal.breed.name) + " " +_.startCase(animal.gender.name) + (animal.quantity > 1 ? "s" : "")}</td>
+												<td className="col-6 text-right">£{numberal(animal.quantity*animal.value).format(NUMBER_FORMAT)}</td>
+											</tr>
+
+									}
 
 								})}
-								<table className="table table-responsize">
-									<tfoot>
-										<tr>
-											<th className="col-6"></th>
-											<th className="col-6">£{arableTotalValue ? arableTotalValue.toFixed(2) : "0.00"}</th>
-										</tr>
-									</tfoot>
-								</table>
+							</tbody>
+							<tfoot>
+								<tr>
+									<th className="col-6"></th>
+									<th className="col-6 text-right">£{numberal(livestockTotalValue).format(NUMBER_FORMAT)}</th>
+								</tr>
+							</tfoot>
+						</table>
+						<br />
 
-								<h5 className="font-weight-bold">Livestock</h5>
-								<p>The following is a breakdown of all livestock and their associated value.</p>
-								<br />
-								{animalTypes.map(animalTypeName => {
+					</div>
 
+					})}
+				</div>
+				<div className="page-break-avoid">
+					<h5 className="font-weight-bold">Stock</h5>
+					<p>The following is a breakdown of all stock, quantity and associated value.</p>
+					<br />
+
+
+					<div className="page-break-avoid">
+						<table className="table table-responsize page-break-avoid">
+							<tbody>
+								{listStock.map(stock => {
+
+									stockTotalValue += (stock.value * stock.quantity);
+
+									return 	<tr key={stock.id}>
+												<td className="col-6">{stock.quantity}x {_.startCase(stock.name)}</td>
+												<td className="col-6 text-right">£{numberal(stock.value * stock.quantity).format(NUMBER_FORMAT)}</td>
+											</tr>
 
 									
 
-									return <Fragment key={animalTypeName} >
-
-										<h6 className="font-weight-bold">{_.startCase(animalTypeName)}</h6>
-										<table className="table table-responsize">
-											<tbody>
-												
-												{animals.map(animal => {
-
-													if(animal.type.name === animalTypeName) {
-
-													livestockTotalValue += (animal.quantity*animal.value);
-
-													return 	<tr key={animal.id}>
-																<td className="col-6">{animal.quantity}x {_.startCase(animal.breed.name) + " " +_.startCase(animal.gender.name) + (animal.quantity > 1 ? "s" : "")}</td>
-																<td className="col-6">£{(animal.quantity*animal.value).toFixed(2)}</td>
-															</tr>
-
-													}
-
-												})}
-											</tbody>
-											<tfoot>
-												<tr>
-													<th className="col-6"></th>
-													<th className="col-6">£{livestockTotalValue.toFixed(2)}</th>
-												</tr>
-											</tfoot>
-										</table>
-										<br />
-
-									</Fragment>
-
-									})}
-								<h5 className="font-weight-bold">Stock</h5>
-								<p>The following is a breakdown of all stock, quantity and associated value.</p>
-								<br />
-
-
-			
-								<table className="table table-responsize">
-									<tbody>
-										{listStock.map(stock => {
-
-											stockTotalValue += (stock.value * stock.quantity);
-
-											return 	<tr key={stock.id}>
-														<td className="col-6">{stock.quantity}x {_.startCase(stock.name)}</td>
-														<td className="col-6">£{(stock.value * stock.quantity).toFixed(2)}</td>
-													</tr>
-
-											
-
-										})}
-									</tbody>
-									<tfoot>
-										<tr>
-											<th className="col-6"></th>
-											<th className="col-6">£{stockTotalValue.toFixed(2)}</th>
-										</tr>
-									</tfoot>
-								</table>
-								<br />
-								<table className="table table-responsize">
-									<tfoot>
-										<tr>
-											<th className="col-6"></th>
-											<th className="col-6">£{(arableTotalValue + livestockTotalValue + stockTotalValue).toFixed(2)}</th>
-										</tr>
-									</tfoot>
-								</table>
-							</div>
-						</Paper>
+								})}
+							</tbody>
+							<tfoot>
+								<tr>
+									<th className="col-6"></th>
+									<th className="col-6 text-right">£{numberal(stockTotalValue).format(NUMBER_FORMAT)}</th>
+								</tr>
+							</tfoot>
+						</table>
 					</div>
-				</Grow>
+				</div>
 				<br />
-				<br />
-				<br />
-				<br />
-				<br />
-				<br />
-				
-			</Dashboard>
+				<table className="table table-responsize">
+					<tfoot>
+						<tr>
+							<th className="col-6">Total Valuation</th>
+							<th className="col-6 text-right">£{numberal(arableTotalValue + livestockTotalValue + stockTotalValue).format(NUMBER_FORMAT)}</th>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+
 		);
 	}
 }
 
-Report.propTypes = {
-	classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(compose(
-	graphql(gql`
-
-		query {
-			listLands {
-				id
-				name
-				size
-				seedCost
-				fertiliserCost
-				limeCost
-				sprayCost
-				cultivationCost
-				licenceCost
-				jobs {
-					type {
-						name
-					}
-				}
-			}
-		}
-	
-	`, {
-		name: "listLands"
-	}),
-	graphql(gql`
-
-		query {
-			listAnimals {
-				id
-				quantity
-				type {
-					name
-				}
-				breed {
-					name
-				}
-				gender {
-					name
-				}
-				value
-			}
-		}
-
-	`, {
-		name: "listAnimals"
-	}),
-	graphql(gql`
-
-		query {
-			listStock {
-				id
-				name
-				quantity
-				value
-			}
-		}
-
-	`, {
-		name: "listStock"
-	})
-)(Report));
+export default withStyles(styles)(Report);

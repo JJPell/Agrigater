@@ -1,125 +1,341 @@
 import React, { Component } from 'react';
-import Select from 'react-select'
+// import Select from 'react-select'
+import Autosuggest from 'react-autosuggest';
+import {     withStyles,
+    Button,
+    Paper,
+    TextField,
+    MenuItem,
+    Grow,
+    CircularProgress,
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    Radio,
+    RadioGroup,
+    FormHelperText,
+    Snackbar
+} from "@material-ui/core";
+import {SnackbarContentWrapper} from "../../components/SnackbarContentWrapper/SnackbarContentWrapper";
 
-import { Button, Paper, TextField, MenuItem, Grow, CircularProgress } from "@material-ui/core";
+import deburr from 'lodash/deburr';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
 
 import _ from "lodash";
 
 import Dashboard from "../layout/Dashboard";
 
 import { compose, graphql } from "react-apollo";
-import listAnimalTypes from "../../queries/listAnimalTypes";
-import createAnimal from "../../mutations/createAnimal";
+import gql from "graphql-tag";
 
 import Sidebar from "./LivestockSidebar";
+
+import { isAuthenticated, isToken } from "../../Auth";
+
+function renderInputComponent(inputProps) {
+    const { classes, inputRef = () => {}, ref, ...other } = inputProps;
+  
+    return (
+      <TextField
+        fullWidth
+        InputProps={{
+            inputRef: node => {
+                ref(node);
+                inputRef(node);
+              },
+          classes: {
+            input: classes.input,
+          },
+        }}
+        {...other}
+      />
+    );
+}
+
+function renderSuggestion(suggestion, { query, isHighlighted }) {
+
+    let searchString = _.capitalize(suggestion.breed) + " - " + _.capitalize(suggestion.gender);
+
+    const matches = match(searchString, query);
+    const parts = parse(searchString, matches);
+
+    return (
+        <MenuItem selected={isHighlighted} component="div">
+        <div>
+            {parts.map((part, index) =>
+            part.highlight ? (
+                <span key={String(index)} style={{ fontWeight: 500 }}>
+                {part.text}
+                </span>
+            ) : (
+                <strong key={String(index)} style={{ fontWeight: 300 }}>
+                {part.text}
+                </strong>
+            ),
+            )}
+        </div>
+        </MenuItem>
+    );
+};
+
+function getSuggestionValue(suggestion) {
+    return suggestion;
+}
+
+const styles = theme => ({
+    root: {
+        height: 250,
+        flexGrow: 1,
+    },
+    container: {
+        position: 'relative',
+    },
+    suggestionsContainerOpen: {
+        position: 'absolute',
+        zIndex: 1000,
+        marginTop: theme.spacing.unit,
+        left: 0,
+        right: 0,
+    },
+    suggestion: {
+        display: 'block',
+    },
+    suggestionsList: {
+        margin: 0,
+        padding: 0,
+        listStyleType: 'none',
+    },
+    divider: {
+        height: theme.spacing.unit * 2,
+    },
+});
+
 
 class LivestockForm extends Component {
 
     state = {
+        animalID: "",
         animal: "",
-        quantity: ""
+        quantity: "",
+        unit: "",
+        valueType: "",
+        value: "",
+        agrigaterValue: "",
+        single: '',
+        popper: '',
+        suggestions: [],
+        showError: false,
+        errorMessage: "",
     }
+    
+	componentWillMount() {
+		isToken(this);
+	}
 
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
     }
 
-    handleChangeSelect({value}) {
-        this.setState({ animal: value });
-    }
+    showErrorHandle = () => {
+        this.setState({ showError: true });
+    };
 
     addAnimal(event) {
 
-        console.log(this.state);
+        if(!this.state.animal) {
+            this.setState({
+                errorMessage: "You must enter an animal type before you can add a new animal."
+            });
+            this.showErrorHandle();
+            return;
+        } else if(!this.state.quantity) {
+            this.setState({
+                errorMessage: "You must enter a quantity before you can add a new animal."
+            });
+            this.showErrorHandle();
+            return;
+        } else if(!this.state.valueType) {
+            this.setState({
+                errorMessage: "You must enter a select a value to use before you can add a new animal."
+            });
+            this.showErrorHandle();
+            return;
+        } else if(!this.state.valueType) {
+            this.setState({
+                errorMessage: "You must enter a select a value to use before you can add a new animal."
+            });
+            this.showErrorHandle();
+            return;
+        } else if((this.state.valueType === "custom") && (!this.state.value || Number(this.state.value) === NaN)) {
+            this.setState({
+                errorMessage: "You must enter a custom value to use before you can add a new animal."
+            });
+            this.showErrorHandle();
+            return;
+        } 
+
+        console.log("value", this.state.value)
+
         this.props.createAnimal({
-            breed: this.state.animal,
-            quantity : this.state.quantity
+            typeID: this.state.animalID,
+            name: this.state.animal,
+            quantity: parseInt(this.state.quantity),
+            value: parseFloat(this.state.value).toFixed(2)
         }).then(response => {
+            console.log("response", response)
             this.props.history.replace("/livestock");
+        }).catch(err => {
+            console.error(err);
+            this.setState({
+                errorMessage: "An application error has occured, cannot add a new animal at this time. Should this error persist, please report it."
+            });
+            this.showErrorHandle();
+            return;
         });
 
     }
 
-    render() {
+    handleSuggestionsFetchRequested = ({ value }) => {
 
-        let groupedOptions = [];
+        console.log("handleSuggestionsFetchRequested")
+        console.log(this.getSuggestions(value))
+        this.setState({
+          suggestions: this.getSuggestions(value),
+        });
+      };
+    
+      handleSuggestionsClearRequested = () => {
+        this.setState({
+          suggestions: [],
+        });
+      };
 
-        if(this.props.data.listAnimalTypes) {
+      handleChangeSuggestion = n => (event, { newValue }) => {
+        console.log("handleChangeSuggestion")
+        console.log(newValue)
 
-            this.props.data.listAnimalTypes.forEach((animalTypes) => {
+        const listAnimalTypes = this.props.data.listAnimalTypes || [];
+        let animalID = "";
+        let animal = newValue;
+        let agrigaterValue = "";
+        let value = "";
 
-                let options = [];
-
-                animalTypes.breeds.forEach((breed) => {
-
-                    options.push({
-                        value: breed.id,
-                        label: _.startCase(breed.name)
+        if(typeof animal === "object") {
+            listAnimalTypes.forEach(animalType => {
+                if(animalType.id == newValue.id) {
+                    animalID = animalType.id;
+                    animal = _.capitalize(animalType.breed) + " - " + _.capitalize(animal.gender);
+                    agrigaterValue = animalType.value ? `(£${animalType.value.toFixed(2)})` : "";
+                    value = animalType.value.toFixed(2);
+                    this.setState({
+                        valueType: "agrigater",
                     });
-
-                });
-
-                groupedOptions.push({
-                    label: animalTypes.name,
-                    options
-                })
-
+                }
             });
-
         }
 
-        const groupStyles = {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-        };
-        const groupBadgeStyles = {
-            backgroundColor: '#EBECF0',
-            borderRadius: '2em',
-            color: '#172B4D',
-            display: 'inline-block',
-            fontSize: 12,
-            fontWeight: 'normal',
-            lineHeight: '1',
-            minWidth: 1,
-            padding: '0.16666666666667em 0.5em',
-            textAlign: 'center',
-        };
+        this.setState({
+            agrigaterValue,
+            animalID,
+            animal,
+            value
+        });
+    };
+    
+      getSuggestions(value, suggestions) {
+        const inputValue = deburr(value.trim()).toLowerCase();
+        const inputLength = inputValue.length;
+        let count = 0;
+        const listAnimalTypes = this.props.data.listAnimalTypes || [];
+    
+        return inputLength === 0 ? [] : listAnimalTypes.filter(suggestion => {
 
-        const formatGroupLabel = data => (
-            <div style={groupStyles}>
-                <span>{data.label}</span>
-                <span style={groupBadgeStyles}>{data.options.length}</span>
-            </div>
-        );
+            let searchString = suggestion.breed + " - " + suggestion.gender;
+
+            
+            const keep = count < 10 && searchString.toLowerCase().indexOf(inputValue) !== -1;
+            console.log("keep")
+            console.log(keep)
+
+            if (keep) {
+            count += 1;
+            }
+    
+            return keep;
+        });
+    }
+
+    hideErrorHandle = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        this.setState({ showError: false });
+    };
+
+    render() {
         
-        console.log(this.props)
+        isAuthenticated(this);
 
-        const { animal, quantity } = this.state;
+        const listAnimalTypes = this.props.data.listAnimalTypes || [];
+        console.log("listAnimalTypes");
+        console.log(listAnimalTypes);
+
+        const { animal, quantity, valueType, animalID } = this.state;
         const loaded = !this.props.data.loading;
+        const { classes } = this.props;
+
+        console.log('this.state.suggestions')
+        console.log(this.state.suggestions)
+        console.log("this.state.animal")
+        console.log(this.state.animal)
+        const autosuggestProps = {
+            renderInputComponent,
+            suggestions: this.state.suggestions,
+            onSuggestionsFetchRequested: this.handleSuggestionsFetchRequested,
+            onSuggestionsClearRequested: this.handleSuggestionsClearRequested,
+            getSuggestionValue,
+            renderSuggestion,
+        };
+
+        // console.log('this.props.data')
+        // console.log(this.props.data)
 
         return (
-            <Dashboard sidebar={<Sidebar />}>
+            <Dashboard sidebar={<Sidebar />}  history={this.props.history}>
 
                 {!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} size={50} /> : null}
 
                 <Grow in={loaded}>
-                    <Paper className="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
+                    <Paper className="offset-md-2 col-md-8 offset-lg-4 col-lg-4">
                         <div className="card-body">
                             <h3 className="card-title">Add New Animal</h3>
                             <hr />
-                        </div>
-                        <div className="card-body">
                             <form>
                                 <div className="form-group">
-                                    <label>Animal</label>
-                                    <Select
-                                        name="animal"
-                                        options={groupedOptions}
-                                        formatGroupLabel={formatGroupLabel}
-                                        onChange={this.handleChangeSelect.bind(this)}
+                                    <Autosuggest
+                                        variant="outlined"
+                                        {...autosuggestProps}
+                                        inputProps={{
+                                            classes,
+                                            placeholder: 'Search for the animal you want to add by typing here',
+                                            value: this.state.animal,
+                                            onChange: this.handleChangeSuggestion('animal'),
+                                            variant: "outlined"
+                                        }}
+                                        theme={{
+                                            container: classes.container,
+                                            suggestionsContainerOpen: classes.suggestionsContainerOpen,
+                                            suggestionsList: classes.suggestionsList,
+                                            suggestion: classes.suggestion,
+                                        }}
+                                        renderSuggestionsContainer={options => (
+                                            <Paper {...options.containerProps} square>
+                                            {options.children}
+                                            </Paper>
+                                        )}
                                     />
-
                                 </div>
                                 <div className="form-group">
                                     <TextField
@@ -129,26 +345,97 @@ class LivestockForm extends Component {
                                         label="Animal Quantity"
                                         value={quantity}
                                         onChange={this.handleChange.bind(this)}
+                                        variant="outlined"
                                     />
                                 </div>
+                                <div className="form-group">
+                                    <FormControl component="fieldset">
+                                        <FormLabel component="legend">Which value should be used?</FormLabel>
+                                        <RadioGroup
+                                            name="valueType"
+                                            value={valueType}
+                                            onChange={this.handleChange.bind(this)}
+                                        >
+                                            <FormControlLabel
+                                                value="agrigater"
+                                                control={<Radio color="primary" />}
+                                                label={"Use Agrigater Value " + this.state.agrigaterValue}
+                                                disabled={animalID ? false:true}
+                                            />
+                                            <FormHelperText>This will use agrigaters built in latest value for this stock type.</FormHelperText>
+                                            <FormControlLabel
+                                                value="custom"
+                                                control={<Radio color="default"/>}
+                                                label="Use Custom Value"
+                                                disabled={this.state.animal === "" ? true:false}
+                                            />
+                                            <FormHelperText>This will allow you to enter your own custom value for this stock type.</FormHelperText>
+                                        </RadioGroup>
+                                    </FormControl>
+                                </div>
+                                {valueType === "custom" ? 
+                                <div className="form-group">
+                                    <TextField
+                                        type="number"
+                                        fullWidth
+                                        name="value"
+                                        label="Custom value (£)"
+                                        value={this.state.value}
+                                        onChange={this.handleChange.bind(this)}
+                                        variant="outlined"
+                                    />
+                                </div>
+                                : null}
                                 <Button variant="contained" color="primary" onClick={this.addAnimal.bind(this)}>Submit</Button>
                             </form>
                         </div>
                     </Paper>
                 </Grow>
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                    }}
+                    open={this.state.showError}
+                    autoHideDuration={5000}
+                    onClose={this.hideErrorHandle}
+                    >
+                    <SnackbarContentWrapper
+                        variant="error"
+                        className={classes.snackbar}
+                        message={this.state.errorMessage}
+                        onClose={this.hideErrorHandle}
+                    />
+                </Snackbar>
             </Dashboard>
         );
     }
 }
 
 
-export default compose(
-    graphql(listAnimalTypes),
-    graphql(createAnimal, {
+export default withStyles(styles)(compose(
+    graphql(gql`
+        query {
+            listAnimalTypes {
+                id
+                type
+                breed
+                gender
+                value
+            }
+        }
+    `),
+    graphql(gql`
+        mutation createAnimal($typeID: ID, $quantity: Int!, $name: String, $value: Float){
+            createAnimal(input: {typeID: $typeID, quantity: $quantity, name: $name, value: $value}) {
+                id
+            }
+        }
+    `, {
         props: props => ({
             createAnimal: animal => props.mutate({
                 variables: animal
             })
         })
     })
-)(LivestockForm);
+)(LivestockForm));

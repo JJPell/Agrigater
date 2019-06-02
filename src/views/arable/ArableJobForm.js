@@ -15,6 +15,8 @@ import listJobTypes from "../../queries/listJobTypes";
 
 import Sidebar from "./ArableSidebar";
 
+import { isAuthenticated, isToken } from "../../Auth";
+
 const styles = theme => ({
     progress: {
       margin: theme.spacing.unit * 2,
@@ -31,6 +33,10 @@ class ArableJobForm extends Component {
         this.setSelectLand = false;
         
     }
+    
+	componentWillMount() {
+		isToken(this);
+	}
 
     state = { 
         selectLand: "",
@@ -75,6 +81,8 @@ class ArableJobForm extends Component {
     }
 
     render() {
+        
+		isAuthenticated(this);
         const { selectLand, selectJobType, date } = this.state;
         const listLands = this.props.listLands.listLands || [];
         const listJobTypes = this.props.listJobTypes.listJobTypes || [];
@@ -83,7 +91,7 @@ class ArableJobForm extends Component {
         const { classes } = this.props;
 
         return (
-            <Dashboard sidebar={<Sidebar />}>
+            <Dashboard sidebar={<Sidebar />} history={this.props.history}>
 
                 {!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} className={classes.progress} size={50} /> : null}
 
@@ -92,32 +100,33 @@ class ArableJobForm extends Component {
                         <div className="card-body">
                             <h3 className="card-title">Add a Job to an Area</h3>
                             <hr />
-                        </div>
-                        <div className="card-body">
                             <form>
                                 <div className="form-group">
-                                    <Select
+                                    <TextField
+                                        select
                                         fullWidth
                                         name="selectLand"
                                         label="Arable Area"
                                         value={selectLand}
                                         onChange={this.handleChange}
+                                        variant="outlined"
                                     >
                                     {listLands.map(land => (
                                         <MenuItem key={land.id} value={land.id}>
                                         {land.name}
                                         </MenuItem>
                                     ))}
-                                    </Select>
+                                    </TextField>
                                 </div>
                                 <div className="form-group">
                                     <TextField
                                         select
                                         fullWidth
                                         name="selectJobType"
-                                        label="Arable Area"
+                                        label="Job Type"
                                         value={selectJobType}
                                         onChange={this.handleChange}
+                                        variant="outlined"
                                         >
                                         {listJobTypes.map(jobType => (
                                             <MenuItem key={jobType.id} value={jobType.id}>
@@ -135,13 +144,20 @@ class ArableJobForm extends Component {
                                         placeholder=""
                                         value={date}
                                         onChange={this.handleChange}
+                                        variant="outlined"
                                         InputLabelProps={{
                                             shrink: true,
                                         }}
                                     />
 
                                 </div>
-                                <Button variant="contained" color="primary" onClick={this.createJob.bind(this)}>Submit</Button>
+                                <div className="row">
+                                    <div className="col-sm-12">
+                                        <div className="d-inline-flex flex-row-reverse w-100">
+                                            <Button variant="contained" color="primary" onClick={this.createJob.bind(this)}>Submit</Button>
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </Paper>

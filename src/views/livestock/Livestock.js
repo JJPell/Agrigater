@@ -20,10 +20,13 @@ import "react-table/react-table.css";
 
 import { compose, graphql } from "react-apollo";
 
-import listAnimals from "../../queries/listAnimals";
 import deleteAnimal from "../../mutations/deleteAnimal";
 
 import Sidebar from "./LivestockSidebar";
+
+import { isAuthenticated, isToken } from "../../Auth";
+import gql from "graphql-tag";
+
 
 class Livestock extends Component {
 
@@ -34,6 +37,10 @@ class Livestock extends Component {
 			selectedAnimal: null
 		};
 
+	}
+	
+	componentWillMount() {
+		isToken(this);
 	}
 	
 	handleOpenDialog (land) {
@@ -60,16 +67,18 @@ class Livestock extends Component {
 
 		this.props.data.refetch();
 
-
 	}
 
 	render() {
+		
+		isAuthenticated(this);
 		let tableData = this.props.data.listAnimals || [];
+		console.log("tableData", tableData);
 		const { fullScreen } = this.props;
 
 		const loaded = !this.props.data.loading;
 		return (
-			<Dashboard sidebar={<Sidebar />}>
+			<Dashboard sidebar={<Sidebar />} history={this.props.history}>
 
 				{!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} size={50} /> : null}
 
@@ -90,22 +99,9 @@ class Livestock extends Component {
 									columns: [
 										{
 											Header: "Type",
-											accessor: "type.name",
+											accessor: "name",
 											Cell: row => {
-												return _.startCase(row.value);
-											}
-										},
-										{
-											Header: "Breed",
-											accessor: "breed.name",
-											Cell: row => {
-												return _.startCase(row.value);
-											}
-										},
-										{
-											Header: "Gender",
-											accessor: "gender.name",
-											Cell: row => {
+												console.log("name", row)
 												return _.startCase(row.value);
 											}
 										},
@@ -166,12 +162,23 @@ class Livestock extends Component {
 	}
 }
 
-Livestock.propTypes = {
-	fullScreen: PropTypes.bool.isRequired,
-};
 
 export default compose(
-	graphql(listAnimals, {
+	graphql(gql`
+		query {
+			listAnimals {
+				id
+				name
+				quantity
+				value
+				type {
+					type
+					gender
+					breed
+				}
+			}
+		}
+	`, {
 		options: {
 			fetchPolicy: "cache-and-network"
 		}

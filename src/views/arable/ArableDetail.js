@@ -24,6 +24,8 @@ import deleteJob from "../../mutations/deleteJob";
 
 import Sidebar from "./ArableSidebar";
 
+import { isAuthenticated, isToken } from "../../Auth";
+
 
 class ArableDetail extends Component {
 
@@ -35,6 +37,10 @@ class ArableDetail extends Component {
         };
         
     }
+    
+	componentWillMount() {
+		isToken(this);
+	}
 
     handleOpenDialog (fieldOrJob) {
 		this.setState({ 
@@ -75,6 +81,7 @@ class ArableDetail extends Component {
 	}
 
     render() {
+        isAuthenticated(this);
 
         let farm = this.props.data.getFarm ? this.props.data.getFarm : {};
         let fields = farm.fields || [];

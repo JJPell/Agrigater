@@ -19,9 +19,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
-const mailFolderListItems = ["test", "2", "3"];
-const otherMailFolderListItems = ["test"];
-
 const drawerWidth = 260;
 
 const styles = theme => ({
@@ -66,7 +63,7 @@ const styles = theme => ({
     }),
     width: theme.spacing.unit * 7,
     [theme.breakpoints.up('sm')]: {
-      width: theme.spacing.unit * 9,
+      width: theme.spacing.unit * 7,
     },
   },
   toolbar: {
@@ -84,7 +81,10 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
     color: "#FFF",
-  },
+	},
+	headerIcon: {
+		height: "36px",
+	},
 });
 
 class Dashboard extends React.Component {
@@ -135,9 +135,10 @@ class Dashboard extends React.Component {
 				>
 				<MenuIcon />
 				</IconButton>
-				<Typography variant="title" color="inherit" noWrap>
+				{/* <Typography variant="title" color="inherit" noWrap>
 					Agrigater
-				</Typography>
+				</Typography> */}
+				<img src="/img/logo/Icon2.png" className={classes.headerIcon} />
 				<Link to="/">
 					<Button className={classes.button}>
 						Report
@@ -158,9 +159,14 @@ class Dashboard extends React.Component {
 						Stock
 					</Button>
 				</Link>
-				<Link to="/account" className="ml-auto">
+				{/* <Link to="/account" className="ml-auto">
 					<Button className={classes.button}>
 						Account
+					</Button>
+				</Link> */}
+				<Link to="/account" className="ml-auto">
+					<Button className={classes.button} onClick={this.signOut}>
+						My Account
 					</Button>
 				</Link>
 				<Link to="/signin">
