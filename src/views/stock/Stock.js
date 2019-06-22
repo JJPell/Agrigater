@@ -81,7 +81,6 @@ class Stock extends Component {
 		return (
 			<Dashboard sidebar={<Sidebar />} history={this.props.history}>
 			
-
 				{!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} size={50} /> : null}
 
 				<Fade in={loaded}>
@@ -100,11 +99,8 @@ class Stock extends Component {
 									Header: "Stock Table",
 									columns: [
 										{
-											Header: "ID",
-											accessor: "id"
-										},
-										{
 											Header: "Name",
+											headerClassName: "text-left",
 											accessor: "name",
 											Cell: row => {
 												return _.startCase(row.value);
@@ -112,6 +108,7 @@ class Stock extends Component {
 										},
 										{
 											Header: "Quantity",
+											headerClassName: "text-left",
 											accessor: "quantity"
 										},
 										{

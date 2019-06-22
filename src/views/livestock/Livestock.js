@@ -99,6 +99,7 @@ class Livestock extends Component {
 									columns: [
 										{
 											Header: "Type",
+											headerClassName: "text-left",
 											accessor: "name",
 											Cell: row => {
 												console.log("name", row)
@@ -107,6 +108,7 @@ class Livestock extends Component {
 										},
 										{
 											Header: "Quantity",
+											headerClassName: "text-left",
 											accessor: "quantity"
 										},
 										{

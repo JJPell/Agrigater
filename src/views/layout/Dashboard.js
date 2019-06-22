@@ -93,7 +93,7 @@ class Dashboard extends React.Component {
 		super();
 
 		this.state = {
-			open: JSON.parse(localStorage.getItem("sidebar")) ? true : false
+			open: JSON.parse(localStorage.getItem("sidebar")) ? false : true
 		}
 	}
 
@@ -135,9 +135,6 @@ class Dashboard extends React.Component {
 				>
 				<MenuIcon />
 				</IconButton>
-				{/* <Typography variant="title" color="inherit" noWrap>
-					Agrigater
-				</Typography> */}
 				<img src="/img/logo/Icon2.png" className={classes.headerIcon} />
 				<Link to="/">
 					<Button className={classes.button}>
@@ -159,11 +156,6 @@ class Dashboard extends React.Component {
 						Stock
 					</Button>
 				</Link>
-				{/* <Link to="/account" className="ml-auto">
-					<Button className={classes.button}>
-						Account
-					</Button>
-				</Link> */}
 				<Link to="/account" className="ml-auto">
 					<Button className={classes.button} onClick={this.signOut}>
 						My Account

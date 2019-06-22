@@ -4,7 +4,6 @@ export default graphql`
 
     query {
         listStock {
-            id
             name
             quantity
         }

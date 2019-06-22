@@ -16,7 +16,7 @@ class SignIn extends Component {
 		{			
 			languageDictionary: {
 				title: "",
-				signUpTerms: "I agree to the <a href='https://my-app-url.com/terms' target='_new'>terms of service</a> and <a href='https://my-app-url.com/privacy' target='_new'>privacy policy</a>."
+				signUpTerms: "I agree to the <a href='https://agrigater.com/terms' target='_new'>terms of service</a> and <a href='https://agrigater.com/privacy' target='_new'>privacy policy</a>."
 			},
 			container: "auth0-container",
 			theme: {
@@ -29,6 +29,7 @@ class SignIn extends Component {
 				redirect: false
 			},
 			mustAcceptTerms: true,
+			initialScreen: window.location.hash === "#signUp" ? 'signUp' : window.location.hash === "#forgotPassword" ? 'forgotPassword' : 'login',
 		}
 	)
 
