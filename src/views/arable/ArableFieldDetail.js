@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
-
 import Dashboard from "../layout/Dashboard";
-import FontAwesome from 'react-fontawesome';
-
 import ReactTable from "react-table";
-import Modal from 'react-modal';
 import "react-table/react-table.css";
 
 import Dialog from '@material-ui/core/Dialog';
@@ -13,17 +9,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import withMobileDialog from '@material-ui/core/withMobileDialog';
 import { Button, Grow, CircularProgress } from "@material-ui/core";
-import { withStyles } from '@material-ui/core/styles';
-
 import { compose, graphql } from "react-apollo";
 import gql from "graphql-tag";
-
-import deleteJob from "../../mutations/deleteJob";
-
 import Sidebar from "./ArableSidebar";
-
 import { isAuthenticated, isToken } from "../../Auth";
 
 
@@ -73,16 +62,11 @@ class ArableFieldDetail extends Component {
 		isAuthenticated(this);
 
         let field = this.props.data.getField ? this.props.data.getField : {};
-        let farm = field.farm || {};
         let jobs = field.jobs || [];
 
         const { fullScreen } = this.props;
 
         const loaded = !this.props.data.loading;
-
-        console.log(this.props)
-
-        const { classes } = this.props;
 
         return (
             <Dashboard sidebar={<Sidebar />} history={this.props.history}>
@@ -244,6 +228,12 @@ export default compose(
             } 
         })
     }),
-    graphql(deleteJob, {
+    graphql(gql`
+        mutation deleteJob(
+            $id: ID!
+        ) {
+            deleteJob(id: $id)
+        }
+    `, {
     })
 )(ArableFieldDetail);

@@ -1,20 +1,10 @@
-import React, { Component, Fragment } from 'react';
-import { PDFViewer } from '@react-pdf/renderer';
-import { Link } from 'react-router-dom';
-import _ from "lodash";
-
-import Dashboard from "../layout/Dashboard";
+import React, { Component } from 'react';
 import Report from "./Report";
-
-import { Paper, Button, Grow, CircularProgress } from "@material-ui/core";
+import { CircularProgress } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
-
 import { compose, graphql } from "react-apollo";
 import gql from "graphql-tag";
-
 import { isAuthenticated, isToken } from "../../Auth";
-import ReactPDF from '@react-pdf/renderer';
-
 
 const styles = theme => ({
 	root: {
@@ -25,7 +15,8 @@ const styles = theme => ({
 	container: {
 		marginTop: "10%",
 	}
-  });
+});
+
 
 class ReportPrint extends Component {
 
@@ -34,27 +25,24 @@ class ReportPrint extends Component {
 	}
 
 	render() {
-		
 
-		const { classes } = this.props;
-
-		let farms = this.props.listFarms.listFarms || [];
-		const animals = this.props.listAnimals.listAnimals || [];
-		const stock = this.props.listStock.listStock || [];
-
-		const loaded = !this.props.listFarms.loading && !this.props.listAnimals.loading && !this.props.listStock.loading;
 		isAuthenticated(this).then(() => {
 			if(loaded) {
 				window.print();
 			}
 		});
 
+		const { classes } = this.props;
+		let farms = this.props.listFarms.listFarms || [];
+		const animals = this.props.listAnimals.listAnimals || [];
+		const stock = this.props.listStock.listStock || [];
+		const loaded = !this.props.listFarms.loading && !this.props.listAnimals.loading && !this.props.listStock.loading;
+
 		return (
-			
 			<div className={this.props.classes.container}>
 				{!loaded ? <CircularProgress style={{marginLeft: "calc(50% - 50px)", marginTop: "200px"}} className={classes.progress} size={50} /> : 
 				<div className="container">
-					<img src="/img/logo/ColorVersion.png" className="img report-logo" />
+					<img src="/img/logo/ColorVersion.png" className="img report-logo" alt="Agrigater Logo" />
 					<Report farms={farms} animals={animals} stock={stock} />	
 				</div>}	
 			</div>

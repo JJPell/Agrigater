@@ -1,35 +1,24 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import gql from "graphql-tag";
-
-import { Button, Paper, TextField, Select, MenuItem, Grow, CircularProgress } from "@material-ui/core";
+import { Button, Paper, TextField, MenuItem, Grow, CircularProgress } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
-
 import Dashboard from "../layout/Dashboard";
-
-import _ from "lodash";
-
 import { compose, graphql } from "react-apollo";
-
-import createJob from "../../mutations/createJob";
-import listJobTypes from "../../queries/listJobTypes";
-
 import Sidebar from "./ArableSidebar";
-
 import { isAuthenticated, isToken } from "../../Auth";
 
 const styles = theme => ({
     progress: {
       margin: theme.spacing.unit * 2,
     },
-  });
+});
+
 
 class ArableJobForm extends Component {
 
     constructor(props) {
         super(props);
-        // bind once here, better than multiple times in render
         this.handleChange = this.handleChange.bind(this);
-
         this.setSelectLand = false;
         
     }
@@ -67,7 +56,6 @@ class ArableJobForm extends Component {
     }
 
     componentWillReceiveProps(newProps){
-        // Set Initial Values
         if(!newProps.listLands.loading){
             this.setState({
                 selectLand: this.getIdFromUrl() || newProps.listLands.listLands[0].id
@@ -87,7 +75,6 @@ class ArableJobForm extends Component {
         const listLands = this.props.listLands.listLands || [];
         const listJobTypes = this.props.listJobTypes.listJobTypes || [];
         const loaded = !this.props.listLands.loading && !this.props.listJobTypes.loading;
-
         const { classes } = this.props;
 
         return (
@@ -186,13 +173,30 @@ export default withStyles(styles)(compose(
             fetchPolicy: "cache-and-network"
         }
     }),
-    graphql(listJobTypes, {
+    graphql(gql`
+        query {
+            listJobTypes {
+                id
+                name
+            }
+        }
+    `, {
         name: "listJobTypes",
         options: {
             fetchPolicy: "cache-and-network"
         }
     }),
-    graphql(createJob, {
+    graphql(gql`
+        mutation createJob(
+            $land: ID!
+            $jobType: ID!
+            $date: String!
+        ) {
+            createJob(landID: $land, typeID: $jobType, date: $date) {
+                id
+            }
+        }
+    `, {
         props: props => ({
             addJob: args => props.mutate({
                 variables: args

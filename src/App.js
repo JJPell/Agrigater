@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import ReportPage from "./views/report/ReportPage";
@@ -23,7 +23,6 @@ import SignIn from "./views/signIn/SignIn";
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import "bootstrap-material-design/dist/css/bootstrap-material-design.min.css";
-
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 

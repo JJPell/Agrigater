@@ -1,23 +1,17 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 
-import Sidebar from "./Sidebar";
-
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 
 import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 const drawerWidth = 260;
 
@@ -118,7 +112,7 @@ class Dashboard extends React.Component {
 
 	render() {
 
-		const { classes, theme } = this.props;
+		const { classes } = this.props;
 
 		return (
 		<div className={classes.root}>
@@ -135,7 +129,7 @@ class Dashboard extends React.Component {
 				>
 				<MenuIcon />
 				</IconButton>
-				<img src="/img/logo/Icon2.png" className={classes.headerIcon} />
+				<img src="/img/logo/Icon2.png" alt="Agrigater Logo" className={classes.headerIcon} />
 				<Link to="/">
 					<Button className={classes.button}>
 						Report

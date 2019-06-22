@@ -1,29 +1,16 @@
 import React, { Component } from 'react';
-import { Link } from "react-router-dom";
-import FontAwesome from 'react-fontawesome';
 import _ from "lodash";
-
 import Dashboard from "../layout/Dashboard";
-
-import PropTypes from 'prop-types';
-
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import withMobileDialog from '@material-ui/core/withMobileDialog';
-import { Button, Paper, Fade, CircularProgress } from "@material-ui/core";
-
+import { Button, Fade, CircularProgress } from "@material-ui/core";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
-
 import { compose, graphql } from "react-apollo";
-
-import deleteAnimal from "../../mutations/deleteAnimal";
-
 import Sidebar from "./LivestockSidebar";
-
 import { isAuthenticated, isToken } from "../../Auth";
 import gql from "graphql-tag";
 
@@ -73,7 +60,6 @@ class Livestock extends Component {
 		
 		isAuthenticated(this);
 		let tableData = this.props.data.listAnimals || [];
-		console.log("tableData", tableData);
 		const { fullScreen } = this.props;
 
 		const loaded = !this.props.data.loading;
@@ -89,8 +75,6 @@ class Livestock extends Component {
 							<h3 className="card-title">Livestock</h3>
 							<hr />
 						</div>
-
-							{/* <BootstrapTable keyField='id' data={ this.props.tableData } columns={ columns } selectRow={ selectRow } hover/> */}
 
 							<ReactTable
 								columns={[
@@ -185,7 +169,11 @@ export default compose(
 			fetchPolicy: "cache-and-network"
 		}
 	}),
-	graphql(deleteAnimal, {
+	graphql(gql`
+		mutation deleteAnimal($id: ID!) {
+			deleteAnimal(id: $id)
+		}
+	`, {
 		options: {
 			fetchPolicy: "cache-and-network"
 		}

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import Select from 'react-select'
 import Autosuggest from 'react-autosuggest';
 import {     withStyles,
     Button,
@@ -17,20 +16,14 @@ import {     withStyles,
     Snackbar
 } from "@material-ui/core";
 import {SnackbarContentWrapper} from "../../components/SnackbarContentWrapper/SnackbarContentWrapper";
-
 import deburr from 'lodash/deburr';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-
 import _ from "lodash";
-
 import Dashboard from "../layout/Dashboard";
-
 import { compose, graphql } from "react-apollo";
 import gql from "graphql-tag";
-
 import Sidebar from "./LivestockSidebar";
-
 import { isAuthenticated, isToken } from "../../Auth";
 
 function renderInputComponent(inputProps) {
@@ -167,7 +160,7 @@ class LivestockForm extends Component {
             });
             this.showErrorHandle();
             return;
-        } else if((this.state.valueType === "custom") && (!this.state.value || Number(this.state.value) === NaN)) {
+        } else if((this.state.valueType === "custom") && (!this.state.value || isNaN(this.state.value))) {
             this.setState({
                 errorMessage: "You must enter a custom value to use before you can add a new animal."
             });
@@ -175,18 +168,14 @@ class LivestockForm extends Component {
             return;
         } 
 
-        console.log("value", this.state.value)
-
         this.props.createAnimal({
             typeID: this.state.animalID,
             name: this.state.animal,
-            quantity: parseInt(this.state.quantity),
+            quantity: Number(this.state.quantity),
             value: parseFloat(this.state.value).toFixed(2)
         }).then(response => {
-            console.log("response", response)
             this.props.history.replace("/livestock");
         }).catch(err => {
-            console.error(err);
             this.setState({
                 errorMessage: "An application error has occured, cannot add a new animal at this time. Should this error persist, please report it."
             });
@@ -198,8 +187,6 @@ class LivestockForm extends Component {
 
     handleSuggestionsFetchRequested = ({ value }) => {
 
-        console.log("handleSuggestionsFetchRequested")
-        console.log(this.getSuggestions(value))
         this.setState({
           suggestions: this.getSuggestions(value),
         });
@@ -212,8 +199,6 @@ class LivestockForm extends Component {
       };
 
       handleChangeSuggestion = n => (event, { newValue }) => {
-        console.log("handleChangeSuggestion")
-        console.log(newValue)
 
         const listAnimalTypes = this.props.data.listAnimalTypes || [];
         let animalID = "";
@@ -223,7 +208,7 @@ class LivestockForm extends Component {
 
         if(typeof animal === "object") {
             listAnimalTypes.forEach(animalType => {
-                if(animalType.id == newValue.id) {
+                if(animalType.id === newValue.id) {
                     animalID = animalType.id;
                     animal = _.capitalize(animalType.breed) + " - " + _.capitalize(animal.gender);
                     agrigaterValue = animalType.value ? `(£${animalType.value.toFixed(2)})` : "";
@@ -253,13 +238,10 @@ class LivestockForm extends Component {
 
             let searchString = suggestion.breed + " - " + suggestion.gender;
 
-            
             const keep = count < 10 && searchString.toLowerCase().indexOf(inputValue) !== -1;
-            console.log("keep")
-            console.log(keep)
 
             if (keep) {
-            count += 1;
+                count += 1;
             }
     
             return keep;
@@ -278,18 +260,9 @@ class LivestockForm extends Component {
         
         isAuthenticated(this);
 
-        const listAnimalTypes = this.props.data.listAnimalTypes || [];
-        console.log("listAnimalTypes");
-        console.log(listAnimalTypes);
-
-        const { animal, quantity, valueType, animalID } = this.state;
+        const { quantity, valueType, animalID } = this.state;
         const loaded = !this.props.data.loading;
         const { classes } = this.props;
-
-        console.log('this.state.suggestions')
-        console.log(this.state.suggestions)
-        console.log("this.state.animal")
-        console.log(this.state.animal)
         const autosuggestProps = {
             renderInputComponent,
             suggestions: this.state.suggestions,
@@ -298,9 +271,6 @@ class LivestockForm extends Component {
             getSuggestionValue,
             renderSuggestion,
         };
-
-        // console.log('this.props.data')
-        // console.log(this.props.data)
 
         return (
             <Dashboard sidebar={<Sidebar />}  history={this.props.history}>

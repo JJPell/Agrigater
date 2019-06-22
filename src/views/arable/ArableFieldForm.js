@@ -1,17 +1,11 @@
 import React, { Component } from 'react';
-
 import Dashboard from "../layout/Dashboard";
-
 import { graphql, compose } from "react-apollo";
 import gql from "graphql-tag";
-
-import createLand from "../../mutations/createLand";
-
-import {Button, Paper, TextField, Select, Input, OutlinedInput, MenuItem, Grow, CircularProgress} from '@material-ui/core';
-
+import {Button, Paper, TextField, Select, OutlinedInput, MenuItem, Grow, CircularProgress} from '@material-ui/core';
 import Sidebar from "./ArableSidebar";
-
 import { isAuthenticated, isToken } from "../../Auth";
+
 
 class ArableFieldForm extends Component {
 

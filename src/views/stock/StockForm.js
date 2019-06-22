@@ -3,10 +3,8 @@ import Autosuggest from 'react-autosuggest';
 import deburr from 'lodash/deburr';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import _ from "lodash";
 import Dashboard from "../layout/Dashboard";
 import {SnackbarContentWrapper} from "../../components/SnackbarContentWrapper/SnackbarContentWrapper";
-
 import { 
     withStyles,
     Button, 
@@ -23,96 +21,90 @@ import {
     FormHelperText,
     Snackbar
 } from "@material-ui/core";
-
 import { compose, graphql } from "react-apollo";
-import listStockTypes from '../../queries/listStockTypes';
-import createStock from "../../mutations/createStock";
-
+import gql from "graphql-tag";
 import Sidebar from "./StockSidebar";
-
 import { isAuthenticated, isToken } from "../../Auth";
-import { transform } from 'async';
-
 
 function renderInputComponent(inputProps) {
     const { classes, inputRef = () => {}, ref, ...other } = inputProps;
-  
+
     return (
-      <TextField
-        fullWidth
-        InputProps={{
-            inputRef: node => {
-                ref(node);
-                inputRef(node);
+        <TextField
+            fullWidth
+            InputProps={{
+                inputRef: node => {
+                    ref(node);
+                    inputRef(node);
                 },
-          classes: {
-            input: classes.input,
-          },
-        }}
-        {...other}
-      />
+            classes: {
+                input: classes.input,
+            },
+            }}
+            {...other}
+        />
     );
-  }
-  
-  function renderSuggestion(suggestion, { query, isHighlighted }) {
+}
+
+function renderSuggestion(suggestion, { query, isHighlighted }) {
     const matches = match(suggestion.name, query);
     const parts = parse(suggestion.name, matches);
-  
-    return (
-      <MenuItem selected={isHighlighted} component="div">
-        <div>
-          {parts.map((part, index) => {
-            return part.highlight ? (
-              <span key={String(index)} style={{ fontWeight: 500 }}>
-                {part.text}
-              </span>
-            ) : (
-              <strong key={String(index)} style={{ fontWeight: 300 }}>
-                {part.text}
-              </strong>
-            );
-          })}
-        </div>
-      </MenuItem>
-    );
-  }
-  
-  function getSuggestionValue(suggestion) {
-    return suggestion.name;
-  }
 
-  const styles = theme => ({
+    return (
+        <MenuItem selected={isHighlighted} component="div">
+            <div>
+            {parts.map((part, index) => {
+                return part.highlight ? (
+                <span key={String(index)} style={{ fontWeight: 500 }}>
+                    {part.text}
+                </span>
+                ) : (
+                <strong key={String(index)} style={{ fontWeight: 300 }}>
+                    {part.text}
+                </strong>
+                );
+            })}
+            </div>
+        </MenuItem>
+    );
+}
+
+function getSuggestionValue(suggestion) {
+    return suggestion.name;
+}
+
+const styles = theme => ({
     root: {
-      height: 250,
-      flexGrow: 1,
+        height: 250,
+        flexGrow: 1,
     },
     container: {
-      position: 'relative',
+        position: 'relative',
     },
     suggestionsContainerOpen: {
-      position: 'absolute',
-      zIndex: 1000,
-      marginTop: theme.spacing.unit,
-      left: 0,
-      right: 0,
+        position: 'absolute',
+        zIndex: 1000,
+        marginTop: theme.spacing.unit,
+        left: 0,
+        right: 0,
     },
     suggestion: {
-      display: 'block',
-      textTransform: 'capitalize'
+        display: 'block',
+        textTransform: 'capitalize'
     },
     suggestionsList: {
-      margin: 0,
-      padding: 0,
-      listStyleType: 'none',
-      textTransform: 'capitalize'
+        margin: 0,
+        padding: 0,
+        listStyleType: 'none',
+        textTransform: 'capitalize'
     },
-    divider: {
-      height: theme.spacing.unit * 2,
+        divider: {
+        height: theme.spacing.unit * 2,
     },
     snackbar: {
         margin: theme.spacing.unit,
     },
-  });
+});
 
 
 class StockForm extends Component {
@@ -138,9 +130,7 @@ class StockForm extends Component {
         this.setState({ [event.target.name]: event.target.value });
     }
 
-    addStock(event) {
-
-        console.log(this.state);
+    addStock() {
 
         if(!this.state.name) {
             this.setState({
@@ -195,7 +185,6 @@ class StockForm extends Component {
     }
 
     componentWillReceiveProps(newProps){
-        // Set Initial Values
         if(!newProps.data.loading){
             this.setState({
                 stockType: newProps.data.listStockTypes ? newProps.data.listStockTypes[0].id : undefined
@@ -222,7 +211,6 @@ class StockForm extends Component {
     }
     
     handleChangeSuggestion = n => (event, { newValue }) => {
-        console.log("handleChangeSuggestion", this.applySentenceCase(newValue))
 
         const listStockTypes = this.props.data.listStockTypes || [];
         let stockID = "";
@@ -233,7 +221,6 @@ class StockForm extends Component {
                 stockID = stockType.id;
                 unit = stockType.unit ? `(${stockType.unit})` : "";
                 agrigaterValue = stockType.value ? `(£${stockType.value.toFixed(2)})` : "";
-                console.log("agrigaterValue", stockType)
                 this.setState({
                     valueType: "agrigater",
                 });
@@ -284,9 +271,6 @@ class StockForm extends Component {
         
 		isAuthenticated(this);
 
-        const listStockTypes = this.props.data.listStockTypes || [];
-        console.log("listStockTypes");
-        console.log(listStockTypes);
         const { stockID, quantity, valueType } = this.state;
         const loaded = !this.props.data.loading;
         const { classes } = this.props;
@@ -417,8 +401,23 @@ class StockForm extends Component {
 
 
 export default withStyles(styles)(compose(
-    graphql(listStockTypes),
-    graphql(createStock, {
+    graphql(gql`
+        query {
+            listStockTypes {
+                id
+                name
+                unit
+                value
+            }
+        }
+    `),
+    graphql(gql`
+        mutation createStock($typeID: ID, $quantity: Int!, $name: String, $value: Float){
+            createStock(input: {typeID: $typeID, quantity: $quantity, name: $name, value: $value}) {
+                id
+            }
+        }
+    `, {
         props: props => ({
             createStock: stock => props.mutate({
                 variables: stock

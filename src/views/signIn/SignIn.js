@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
-import { graphql } from "react-apollo";
 import styled from 'styled-components';
 import loginImg from '../../img/login-screen.jpg';
-
-import { Paper } from "@material-ui/core";
-
 import Auth0Lock from "auth0-lock";
 
 
@@ -36,9 +32,7 @@ class SignIn extends Component {
 	constructor() {
 
 		super();
-
 		this.onAuthenticated = this.onAuthenticated.bind(this);
-
 		this.onAuthenticated();
 		
 	}
@@ -49,17 +43,14 @@ class SignIn extends Component {
 		this.lock.on("authenticated", (function(authResult) {
 			// Use the token in authResult to getUserInfo() and save it to localStorage
 			self.lock.getUserInfo(authResult.accessToken, function(error, profile) {
-			  if (error) {
-				console.error(error);
-				return;
-			  }
-		
-			  console.log(authResult);
-			//   console.log(profile);
-		
-			  localStorage.setItem("token", `Bearer ${authResult.accessToken}`);
-			  localStorage.setItem('profile', JSON.stringify(profile));
-			  self.props.history.replace("/");
+				if (error) {
+					console.error(error);
+					return;
+				}
+			
+				localStorage.setItem("token", `Bearer ${authResult.accessToken}`);
+				localStorage.setItem('profile', JSON.stringify(profile));
+				self.props.history.replace("/");
 			});
 		}));
 	}
@@ -77,23 +68,18 @@ class SignIn extends Component {
 			height: 100vh;
 		`;
 
-		const { history } = this.props;
-
 		return (
-			
 			<Background>
 				<div className="container">
-				<div className="row">
-					<div id="auth0-container" className="col-sm-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+					<div className="row">
+						<div id="auth0-container" className="col-sm-12 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
 
+						</div>
 					</div>
-				</div>
-
 				</div>
 			</Background>
 		)
 	}
 }
-
 
 export default SignIn;

@@ -1,29 +1,17 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
-
 import Dashboard from "../layout/Dashboard";
-import FontAwesome from 'react-fontawesome';
-
 import ReactTable from "react-table";
-import Modal from 'react-modal';
 import "react-table/react-table.css";
-
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import withMobileDialog from '@material-ui/core/withMobileDialog';
 import { Button, Grow, CircularProgress } from "@material-ui/core";
-import { withStyles } from '@material-ui/core/styles';
-
 import { compose, graphql } from "react-apollo";
 import gql from "graphql-tag";
-
-import deleteJob from "../../mutations/deleteJob";
-
 import Sidebar from "./ArableSidebar";
-
 import { isAuthenticated, isToken } from "../../Auth";
 
 
@@ -35,7 +23,6 @@ class ArableDetail extends Component {
 			showDialog: false,
 			selected: null
         };
-        
     }
     
 	componentWillMount() {
@@ -89,10 +76,6 @@ class ArableDetail extends Component {
         const { fullScreen } = this.props;
 
         const loaded = !this.props.data.loading;
-
-        console.log(this.props)
-
-        const { classes } = this.props;
 
         const { selected } = this.state;
 
@@ -192,7 +175,7 @@ class ArableDetail extends Component {
                                     <h3 className="card-title">{farm.name} Jobs</h3>
                                 </div>
                                 <ReactTable
-                                    data={ jobs.map((prop,key) => {
+                                    data={ jobs.map(prop => {
                                         return ({
                                             ...prop,
                                             actions: (
@@ -297,7 +280,13 @@ export default compose(
             } 
         })
     }),
-    graphql(deleteJob, {
+    graphql(gql`
+        mutation deleteJob(
+            $id: ID!
+        ) {
+            deleteJob(id: $id)
+        }
+    `, {
         name: "deleteJob"
     }),
     graphql(gql`

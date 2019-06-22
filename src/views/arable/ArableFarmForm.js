@@ -1,29 +1,11 @@
 import React, { Component } from 'react';
-
 import Dashboard from "../layout/Dashboard";
-
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
-
-import {Button, Paper, TextField, Select, Input, MenuItem, Grow, CircularProgress, FormControl, OutlinedInput} from '@material-ui/core';
-
+import {Button, Paper, TextField, Select, MenuItem, Grow, CircularProgress, OutlinedInput} from '@material-ui/core';
 import Sidebar from "./ArableSidebar";
-
 import { isAuthenticated, isToken } from "../../Auth";
 
-const createFarm = gql`
-
-    mutation createFarm(
-        $input: FarmInput!
-    ) {
-        createFarm(
-            input: $input
-        ) {
-            id
-        }
-    }
-
-`;
 
 class ArableFarmForm extends Component {
 
@@ -67,8 +49,6 @@ class ArableFarmForm extends Component {
 
         }
 
-        console.log(validationErrors)
-
         if(isError) {
 
             this.setState({
@@ -95,7 +75,6 @@ class ArableFarmForm extends Component {
         }
 
         let isError = this.validate(input);
-        console.log(isError)
 
         if(!isError) {
             this.props.onAdd({input}).then(response => {
@@ -103,8 +82,6 @@ class ArableFarmForm extends Component {
             });
         }
 
-        console.log(input);
-        console.log(this.state);
     }
 
     render() {
@@ -125,9 +102,6 @@ class ArableFarmForm extends Component {
             validationErrors
         } = this.state;
 
-        console.log("validationErrors")
-        console.log(validationErrors)
-
         return (
             <Dashboard sidebar={<Sidebar />} history={this.props.history}>
 
@@ -138,8 +112,6 @@ class ArableFarmForm extends Component {
                         <div className="card-body">
                             <h3 className="card-title">Create a New Farm</h3>
                             <hr />
-                        {/* </div>
-                        <div className="card-body"> */}
                             <form>
                                 <div className="row">
                                     <div className="col-sm-12">
@@ -298,8 +270,19 @@ class ArableFarmForm extends Component {
     }
 }
 
-// TODO:  https://youtu.be/qNkkPoq9D3k?t=34m
-export default graphql(createFarm, {
+export default graphql(gql`
+
+        mutation createFarm(
+            $input: FarmInput!
+        ) {
+            createFarm(
+                input: $input
+            ) {
+                id
+            }
+        }
+
+    `, {
 	props: props => ({
 		onAdd: farm => props.mutate({
             variables: farm

@@ -1,30 +1,18 @@
-import React, { Component, Fragment } from 'react';
-import { Link } from "react-router-dom";
-import FontAwesome from 'react-fontawesome';
+import React, { Component } from 'react';
 import _ from "lodash";
-
-import Dashboard from "../layout/Dashboard";
-
-import PropTypes from 'prop-types';
-import { Paper, Button, Grow, CircularProgress } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
-
-import { compose, graphql } from "react-apollo";
-import gql from "graphql-tag";
-
-import { isAuthenticated, isToken } from "../../Auth";
-
 import numberal from "numeral";
-const NUMBER_FORMAT = '0,0.00';
+import config from "../../config";
 
-
+const NUMBER_FORMAT = config.numberFormat;
 const styles = theme => ({
 	root: {
 	  ...theme.mixins.gutters(),
 	  paddingTop: theme.spacing.unit * 2,
 	  paddingBottom: theme.spacing.unit * 2,
 	},
-  });
+});
+
 
 class Report extends Component {
 
@@ -33,13 +21,9 @@ class Report extends Component {
 		let types = [];
 
 		listAnimals.forEach(animal => {
-
 			if(types.indexOf(animal.type.name) < 0) {
-
 				types.push(animal.type.name);
-
 			}
-
 		});
 
 		return types;
@@ -47,10 +31,6 @@ class Report extends Component {
 	}
 
 	render() {
-
-		const { classes } = this.props;
-
-		console.log(this.props)
 
 		let lands = this.props.farms ? this.props.farms : [];
 		const animals = this.props.animals ? this.props.animals : [];
@@ -60,8 +40,6 @@ class Report extends Component {
 		let arableTotalValue = 0;
 		let livestockTotalValue = 0;
 		let stockTotalValue = 0;
-
-		//const loaded = !this.props.listFarms.loading && !this.props.listAnimals.loading && !this.props.listStock.loading;
 
 		return (
 

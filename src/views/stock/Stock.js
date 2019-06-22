@@ -1,31 +1,17 @@
 import React, { Component } from 'react';
-import { Link } from "react-router-dom";
-import FontAwesome from 'react-fontawesome';
 import _ from "lodash";
-
 import Dashboard from "../layout/Dashboard";
-
 import ReactTable from "react-table";
 import "react-table/react-table.css";
-
-import PropTypes from 'prop-types';
-
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import withMobileDialog from '@material-ui/core/withMobileDialog';
-
-import { Button, Paper, Fade, CircularProgress } from "@material-ui/core";
-
+import { Button, Fade, CircularProgress } from "@material-ui/core";
 import { compose, graphql } from "react-apollo";
-
-import listStock from "../../queries/listStock";
-import deleteStock from "../../mutations/deleteStock";
-
+import gql from "graphql-tag";
 import Sidebar from "./StockSidebar";
-
 import { isAuthenticated, isToken } from "../../Auth";
 
 
@@ -166,12 +152,25 @@ class Stock extends Component {
 
 
 export default compose(
-	graphql(listStock, {
+	graphql(gql`
+		query {
+			listStock {
+				name
+				quantity
+			}
+		}
+	`, {
 		options: {
 			fetchPolicy: "cache-and-network"
 		}
 	}),
-	graphql(deleteStock, {
+	graphql(gql`
+		mutation deleteStock(
+			$id: ID!
+		) {
+			deleteStock(id: $id)
+		}
+	`, {
 		options: {
 			fetchPolicy: "cache-and-network"
 		}
