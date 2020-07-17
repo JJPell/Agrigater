@@ -30,7 +30,7 @@
     "bootstrap-material-design": "^4.1.1",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.1",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "moment": "^2.22.2",
     "numeral": "^2.0.6",
     "react": "^16.3.2",
